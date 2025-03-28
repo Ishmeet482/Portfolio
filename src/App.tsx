@@ -7,7 +7,7 @@ import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import Photography from "./pages/Photography";
 import Gaming from "./pages/Gaming";  // Import Gaming Page
-
+import { Analytics } from "@vercel/analytics/react"
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -23,6 +23,7 @@ const App = () => (
           <Route path="*" element={<NotFound />} />
         </Routes>
       </HashRouter>
+      <Analytics />
     </TooltipProvider>
   </QueryClientProvider>
 );
