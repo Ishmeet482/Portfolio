@@ -1,0 +1,308 @@
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,700;1,400&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 50 100% 97%;
+    --foreground: 240 10% 3.9%;
+    
+    --card: 0 0% 100%;
+    --card-foreground: 240 10% 3.9%;
+    
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 10% 3.9%;
+    
+    --primary: 240 5.9% 10%;
+    --primary-foreground: 0 0% 98%;
+    
+    --secondary: 240 4.8% 95.9%;
+    --secondary-foreground: 240 5.9% 10%;
+    
+    --muted: 240 4.8% 95.9%;
+    --muted-foreground: 240 3.8% 46.1%;
+    
+    --accent: 240 4.8% 95.9%;
+    --accent-foreground: 240 5.9% 10%;
+    
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    
+    --border: 240 5.9% 90%;
+    --input: 240 5.9% 90%;
+    --ring: 240 5.9% 10%;
+    
+    --radius: 0.5rem;
+  }
+  
+  .dark-mode {
+    --background: 240 10% 3.9%;
+    --foreground: 0 0% 98%;
+    
+    --card: 240 10% 3.9%;
+    --card-foreground: 0 0% 98%;
+    
+    --popover: 240 10% 3.9%;
+    --popover-foreground: 0 0% 98%;
+    
+    --primary: 0 0% 98%;
+    --primary-foreground: 240 5.9% 10%;
+    
+    --secondary: 240 3.7% 15.9%;
+    --secondary-foreground: 0 0% 98%;
+    
+    --muted: 240 3.7% 15.9%;
+    --muted-foreground: 240 5% 64.9%;
+    
+    --accent: 240 3.7% 15.9%;
+    --accent-foreground: 0 0% 98%;
+    
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+    
+    --border: 240 3.7% 15.9%;
+    --input: 240 3.7% 15.9%;
+    --ring: 240 4.9% 83.9%;
+  }
+  
+  * {
+    @apply border-border;
+  }
+  
+  html {
+    scroll-behavior: smooth;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  
+  body {
+    @apply bg-yellow-light text-foreground font-sans antialiased;
+    letter-spacing: -0.01em;
+  }
+  
+  .dark-mode body {
+    @apply bg-charcoal-dark text-offwhite;
+  }
+}
+
+@layer components {
+  .section-container {
+    @apply max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24;
+  }
+  
+  .divider {
+    @apply w-16 h-px bg-border my-6;
+  }
+  
+  /* Define section transitions */
+  .section-enter {
+    @apply opacity-0 translate-y-8;
+  }
+  
+  .section-enter-active {
+    @apply opacity-100 translate-y-0 transition-all duration-700 ease-out;
+  }
+  
+  /* Card hover effects */
+  .card-hover {
+    @apply transition-all duration-300 hover:translate-y-[-5px];
+  }
+
+  /* Project card style with yellow/gold hover effect */
+  .project-card {
+    @apply bg-white rounded-2xl overflow-hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.5s ease;
+  }
+  
+  .project-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 10px 10px -5px rgba(0, 0, 0, 0.02);
+    background: linear-gradient(135deg, #ffffff 0%, #FEF7CD 70%, #f5e150 100%);
+  }
+  
+  .dark-mode .project-card {
+    @apply bg-charcoal text-offwhite;
+  }
+  
+  .dark-mode .project-card:hover {
+    background: linear-gradient(135deg, #303030 0%, #403E43 70%, #5a5a5a 100%);
+  }
+
+  /* Stack card style */
+  .stack-card {
+    @apply bg-white rounded-2xl overflow-hidden p-6;
+    transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.5s ease;
+  }
+  
+  .stack-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 10px 10px -5px rgba(0, 0, 0, 0.02);
+    background: linear-gradient(135deg, #ffffff 0%, #FEF7CD 70%, #f5e150 100%);
+  }
+  
+  .dark-mode .stack-card {
+    @apply bg-charcoal text-offwhite;
+  }
+  
+  .dark-mode .stack-card:hover {
+    background: linear-gradient(135deg, #303030 0%, #403E43 70%, #5a5a5a 100%);
+  }
+
+  /* Spotify card style */
+  .spotify-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  
+  .spotify-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15), 0 10px 10px -5px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Gaming card and Photography card style */
+  .game-overview-card, .photography-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
+  }
+  
+  .game-overview-card:hover, .photography-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15), 0 10px 10px -5px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Music note animations */
+  .music-note {
+    font-size: 24px;
+    opacity: 0;
+    animation: float-note 3s linear infinite;
+  }
+  
+  @keyframes float-note {
+    0% {
+      transform: translate(0, 0) rotate(0deg);
+      opacity: 0;
+    }
+    20% {
+      opacity: 1;
+    }
+    80% {
+      opacity: 1;
+    }
+    100% {
+      transform: translate(0, -100px) rotate(20deg);
+      opacity: 0;
+    }
+  }
+
+  /* Navigation pill */
+  .nav-pill {
+    @apply bg-black text-white rounded-full px-4 py-2;
+  }
+  
+  .dark-mode .nav-pill {
+    @apply bg-yellow-accent text-charcoal-dark;
+  }
+  
+  /* Connect button glow effect */
+  .connect-btn {
+    @apply relative bg-black text-yellow-accent font-medium rounded-full transition-all duration-300;
+    box-shadow: 0 0 30px 5px rgba(245, 225, 80, 0.6);
+  }
+  
+  .connect-btn:hover {
+    @apply bg-black text-yellow-accent;
+    box-shadow: 0 0 40px 10px rgba(245, 225, 80, 0.8);
+    transform: translateY(-2px) scale(1.02);
+  }
+  
+  .dark-mode .connect-btn {
+    @apply bg-yellow-accent text-charcoal-dark;
+    box-shadow: 0 0 30px 5px rgba(245, 225, 80, 0.4);
+  }
+  
+  .dark-mode .connect-btn:hover {
+    box-shadow: 0 0 40px 10px rgba(245, 225, 80, 0.6);
+  }
+  
+  /* Social media icons */
+  .social-icon {
+    @apply p-3 rounded-full bg-black text-white hover:bg-yellow-accent hover:text-black transition-colors duration-300;
+  }
+  
+  .dark-mode .social-icon {
+    @apply bg-yellow-accent text-charcoal-dark hover:bg-white hover:text-black;
+  }
+  
+  /* Email link animation */
+  .email-link {
+    @apply relative inline-flex items-center text-foreground overflow-hidden;
+  }
+  
+  .email-link:after {
+    content: '';
+    @apply absolute bottom-0 left-0 w-full h-0.5 bg-yellow-accent scale-x-0 origin-bottom-right transition-transform duration-300 ease-out;
+  }
+  
+  .email-link:hover:after {
+    @apply scale-x-100 origin-bottom-left;
+  }
+  
+  /* Animation delay utility classes */
+  .animation-delay-100 {
+    animation-delay: 100ms;
+  }
+  
+  .animation-delay-200 {
+    animation-delay: 200ms;
+  }
+  
+  .animation-delay-300 {
+    animation-delay: 300ms;
+  }
+  
+  .animation-delay-500 {
+    animation-delay: 500ms;
+  }
+  
+  .animation-delay-700 {
+    animation-delay: 700ms;
+  }
+  
+  .animation-delay-1000 {
+    animation-delay: 1000ms;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+  
+  .text-pretty {
+    text-wrap: pretty;
+  }
+  
+  /* Add a subtle pulse animation */
+  .animate-pulse-subtle {
+    animation: pulse-subtle 3s infinite;
+  }
+  
+  @keyframes pulse-subtle {
+    0%, 100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.8;
+    }
+  }
+  
+  /* Floating animation for cards */
+  .hover-float:hover {
+    transform: translateY(-5px);
+    transition: transform 0.3s ease;
+  }
+  
+}
