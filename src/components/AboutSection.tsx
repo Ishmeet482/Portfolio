@@ -132,16 +132,19 @@ const AboutSection = () => {
               </h2>
               
               <div className="space-y-6 text-charcoal/80 dark:text-offwhite/80">
+              <p className="text-lg">
+              From tinkering with code to capturing moments—my journey is all about creating and exploring.
+                </p>
                 <p className="text-lg">
-                Hey, I'm a software engineer who loves crafting clean, user-friendly experiences. I enjoy building things that blend design and functionality seamlessly.
+                Growing up, I was always drawn to things that blended logic with creativity. Whether it was sketching designs, tweaking code, or losing myself in a well-crafted game world, I loved understanding how things worked and making them better. That curiosity led me to software engineering—where structure meets artistry.
                 </p>
                 
                 <p className="text-lg">
-                With a background in both design and development, I focus on creating intuitive and visually compelling digital experiences. I love the creative problem-solving that comes with coding—where logic meets aesthetics to build something impactful.
+                Now, I build digital experiences that are as intuitive as they are visually engaging. I thrive on solving complex problems, turning ideas into seamless interactions, and making technology feel effortless.
                 </p>
                 
                 <p className="text-lg">
-                Beyond Coding, I vibe to good music, capture moments through photography, and dive into games—whether it's a tactical shooter, an RPG, or a story-driven adventure. Always exploring, always learning.
+                Beyond coding, I find inspiration in music, photography, and gaming. Whether it's the rhythm of a song, the perfect shot in golden hour, or the immersion of a deep RPG, I'm always chasing experiences that spark creativity. Always exploring, always learning.
                 </p>
               </div>
             </div>

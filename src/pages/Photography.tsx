@@ -9,7 +9,7 @@ import Footer from "@/components/Footer";
 
 const images = [
   { src: "/images/Photography/1.jpeg", caption: "Sunset over the moutains" },
-  { src: "/images/Photography/2.jpeg", caption: "Royal Embassy, Manipal" },
+  { src: "/images/Photography/2.jpeg", caption: "Sunset, Manipal" },
   { src: "/images/Photography/3.jpeg", caption: "NIH , Manipal" },
   { src: "/images/Photography/4.jpeg", caption: "Sunset" },
   { src: "/images/Photography/5.jpeg", caption: "Night Flight" },
