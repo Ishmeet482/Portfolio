@@ -37,7 +37,7 @@ This project demonstrates a full-stack personal portfolio website built using mo
 ## 1. Clone the Repository
 
 git clone https://github.com/Ishmeet482/Portfolio.git
-cd Portfolio
+
 
 cd <repository_directory>
 
