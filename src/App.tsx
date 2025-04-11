@@ -7,6 +7,7 @@ import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import Photography from "./pages/Photography";
 import Gaming from "./pages/Gaming";  // Import Gaming Page
+import Media from "./pages/Media";
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -19,6 +20,7 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/photography" element={<Photography />} />
           <Route path="/gaming" element={<Gaming />} />  {/* ✅ Added Gaming Page Route */}
+          <Route path="/media" element={<Media />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </HashRouter>
