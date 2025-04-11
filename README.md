@@ -54,11 +54,6 @@ Run the following command:
 npm run dev
 
 
-For Airflow, use Astro CLI to start your Airflow environment:
-
-astro dev start
-
-
 ## 3. Tools Used
 
 * React: UI library
