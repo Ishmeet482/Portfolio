@@ -1,0 +1,193 @@
+/* ─────────────────────────────────────────────────────────────
+   Polaroid Carousel — premium redesign
+   ───────────────────────────────────────────────────────────── */
+
+/* ── Outer container ── */
+.polaroid-carousel {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ── Slide wrapper: handles opacity + scale fade transition ── */
+.polaroid-slide {
+  position: absolute;
+  opacity: 0;
+  transform: scale(0.96);
+  transition:
+    opacity 0.70s cubic-bezier(0.4, 0, 0.2, 1),
+    transform 0.70s cubic-bezier(0.34, 1.12, 0.64, 1);
+  pointer-events: none;
+  will-change: opacity, transform;
+  z-index: 1;
+}
+
+.polaroid-slide.is-active {
+  opacity: 1;
+  transform: scale(1);
+  pointer-events: auto;
+  z-index: 10;
+}
+
+/* ── Per-slide rotation via CSS variable ── */
+.polaroid-slide:nth-child(1) .polaroid { --rotation: -2deg; }
+.polaroid-slide:nth-child(2) .polaroid { --rotation:  2deg; }
+.polaroid-slide:nth-child(3) .polaroid { --rotation: -1.5deg; }
+.polaroid-slide:nth-child(4) .polaroid { --rotation:  2.5deg; }
+.polaroid-slide:nth-child(5) .polaroid { --rotation: -1deg; }
+
+/* ── Polaroid card: rotation + float ── */
+.polaroid {
+  position: relative;
+  width: 480px;
+  background-color: #f7f3ec;
+  padding: 18px 18px 0 18px;
+  border-radius: 4px;
+  border: 1px solid rgba(160, 140, 110, 0.16);
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.04),
+    0 3px 8px rgba(0, 0, 0, 0.07),
+    0 8px 24px rgba(0, 0, 0, 0.09),
+    0 20px 48px rgba(0, 0, 0, 0.09),
+    0 36px 72px rgba(0, 0, 0, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.90),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.03);
+  display: flex;
+  flex-direction: column;
+  animation: polaroid-float 6s ease-in-out infinite;
+  transform: rotate(var(--rotation, 0deg));
+}
+
+/* Lift + pause float on hover */
+.polaroid:hover {
+  animation-play-state: paused;
+  transform: rotate(var(--rotation, 0deg)) translateY(-7px) scale(1.016);
+  box-shadow:
+    0 2px 4px rgba(0, 0, 0, 0.06),
+    0 8px 20px rgba(0, 0, 0, 0.11),
+    0 20px 52px rgba(0, 0, 0, 0.13),
+    0 40px 80px rgba(0, 0, 0, 0.09),
+    inset 0 1px 0 rgba(255, 255, 255, 0.92);
+  transition:
+    transform 0.45s cubic-bezier(0.34, 1.5, 0.64, 1),
+    box-shadow 0.40s ease;
+}
+
+/* Floating keyframe — does NOT conflict with rotate() because
+   it only moves translateY inside the same transform value    */
+@keyframes polaroid-float {
+  0%,  100% { transform: rotate(var(--rotation, 0deg)) translateY(0px);   }
+  50%        { transform: rotate(var(--rotation, 0deg)) translateY(-10px); }
+}
+
+/* Warm gloss sheen on the card surface */
+.polaroid::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 3px;
+  background: linear-gradient(
+    148deg,
+    rgba(255, 255, 255, 0.28) 0%,
+    transparent 48%,
+    rgba(0, 0, 0, 0.012) 100%
+  );
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* ── Image area with fixed 3:2 aspect ratio ── */
+.polaroid-image-wrapper {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 3 / 2;
+  overflow: hidden;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+.polaroid-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  filter: contrast(1.04) saturate(0.90) brightness(1.01);
+  transition: transform 0.70s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Vignette over image */
+.polaroid-image-wrapper::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    ellipse at center,
+    transparent 52%,
+    rgba(0, 0, 0, 0.16) 100%
+  );
+  pointer-events: none;
+  z-index: 1;
+  border-radius: 2px;
+}
+
+/* Film grain over image */
+.polaroid-image-wrapper::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.72' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  opacity: 0.048;
+  pointer-events: none;
+  z-index: 2;
+  mix-blend-mode: multiply;
+  border-radius: 2px;
+}
+
+/* ── Responsive sizing ── */
+@media (max-width: 1023px) {
+  .polaroid {
+    width: 340px;
+    padding: 14px 14px 0 14px;
+  }
+  .polaroid-caption {
+    height: 60px;
+    font-size: 13.5px;
+    padding: 0 14px;
+  }
+}
+
+@media (max-width: 639px) {
+  .polaroid {
+    width: 270px;
+    padding: 11px 11px 0 11px;
+  }
+  .polaroid-caption {
+    height: 52px;
+    font-size: 12px;
+    padding: 0 11px;
+  }
+}
+
+/* ── Caption in the bottom white strip ── */
+.polaroid-caption {
+  flex-shrink: 0;
+  height: 70px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 18px;
+  font-family: 'DM Serif Display', Georgia, serif;
+  font-style: italic;
+  font-weight: 400;
+  font-size: 15px;
+  color: rgba(50, 40, 26, 0.50);
+  letter-spacing: 0.028em;
+  text-align: center;
+  line-height: 1.45;
+  background: none;
+  position: relative;
+  z-index: 3;
+}
