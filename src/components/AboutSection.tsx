@@ -492,7 +492,7 @@ const AboutSection = () => {
 
                 {/* Bottom-left content + CTA */}
                 <div className="absolute bottom-4 left-4 flex flex-col gap-2">
-                  <p className="text-[0.88rem] font-semibold leading-tight text-white/90">Current favourites</p>
+                  <p className="text-[0.88rem] font-semibold leading-tight text-white/90">Currently Playing</p>
                   <Link
                     to="/gaming"
                     className="inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-[0.62rem] font-semibold text-white/80 backdrop-blur-sm transition-all duration-300 hover:bg-white/20 hover:text-white"
