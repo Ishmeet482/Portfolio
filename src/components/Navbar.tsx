@@ -6,7 +6,7 @@ const navLinks = [
   { name: "Work", href: "#projects" },
   { name: "Stack", href: "#stack" },
   { name: "Story", href: "#about" },
-  { name: "Chat", href: "#contact" },
+  { name: "Contact", href: "#contact", cta: true },
 ];
 
 interface NavbarProps {
@@ -26,9 +26,9 @@ const Navbar = ({ immersive = false }: NavbarProps) => {
   const [activeSection, setActiveSection] = useState("hero");
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
+  const [isNavVisible, setIsNavVisible] = useState(false);
   const [greeting, setGreeting] = useState("");
   const [isGreetingVisible, setIsGreetingVisible] = useState(false);
-  const [isGreetingBreathing, setIsGreetingBreathing] = useState(false);
 
   useEffect(() => {
     const storedDarkMode = localStorage.getItem("darkMode") === "true";
@@ -39,17 +39,13 @@ const Navbar = ({ immersive = false }: NavbarProps) => {
       setIsGreetingVisible(true);
     });
 
-    const breathingTimer = window.setTimeout(() => {
-      setIsGreetingBreathing(true);
-    }, 280);
-
-    const breathingStopTimer = window.setTimeout(() => {
-      setIsGreetingBreathing(false);
-    }, 1680);
-
     const expansionTimer = window.setTimeout(() => {
       setIsExpanded(true);
-    }, 2000);
+    }, 1300);
+
+    const navRevealTimer = window.setTimeout(() => {
+      setIsNavVisible(true);
+    }, 1900);
 
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 24);
@@ -73,9 +69,8 @@ const Navbar = ({ immersive = false }: NavbarProps) => {
 
     return () => {
       window.cancelAnimationFrame(entranceFrame);
-      window.clearTimeout(breathingTimer);
-      window.clearTimeout(breathingStopTimer);
       window.clearTimeout(expansionTimer);
+      window.clearTimeout(navRevealTimer);
       window.removeEventListener("scroll", handleScroll);
     };
   }, []);
@@ -99,6 +94,8 @@ const Navbar = ({ immersive = false }: NavbarProps) => {
             activeText: "text-yellow-soft",
             toggle:
               "border-offwhite/12 bg-white/10 text-offwhite/76 hover:bg-white/14 hover:text-offwhite",
+            cta:
+              "bg-white/10 text-white shadow-[inset_0_0_0_1px_rgba(251,251,250,0.12)] hover:bg-white hover:text-charcoal",
             hover: "hover:text-offwhite",
           }
         : {
@@ -112,6 +109,8 @@ const Navbar = ({ immersive = false }: NavbarProps) => {
             activeText: "text-yellow-soft",
             toggle:
               "border-offwhite/12 bg-white/10 text-offwhite/76 hover:bg-white/14 hover:text-offwhite",
+            cta:
+              "bg-white/10 text-white shadow-[inset_0_0_0_1px_rgba(251,251,250,0.12)] hover:bg-white hover:text-charcoal",
             hover: "hover:text-offwhite",
           };
     }
@@ -128,6 +127,8 @@ const Navbar = ({ immersive = false }: NavbarProps) => {
           activeText: "text-[#7c724a]",
           toggle:
             "border-black/10 bg-black/6 text-charcoal/68 hover:bg-black/10 hover:text-charcoal",
+          cta:
+            "bg-charcoal/80 text-white shadow-[inset_0_0_0_1px_rgba(255,255,255,0.16)] hover:bg-white hover:text-charcoal",
           hover: "hover:text-charcoal",
         }
       : {
@@ -141,6 +142,8 @@ const Navbar = ({ immersive = false }: NavbarProps) => {
           activeText: "text-[#7c724a]",
           toggle:
             "border-black/10 bg-black/6 text-charcoal/68 hover:bg-black/10 hover:text-charcoal",
+          cta:
+            "bg-charcoal/80 text-white shadow-[inset_0_0_0_1px_rgba(255,255,255,0.16)] hover:bg-white hover:text-charcoal",
           hover: "hover:text-charcoal",
         };
   }, [immersive, isDarkMode]);
@@ -161,15 +164,17 @@ const Navbar = ({ immersive = false }: NavbarProps) => {
     <header className="fixed left-1/2 top-0 z-50 -translate-x-1/2 px-4 pt-5 sm:px-6 sm:pt-6">
       <div
         className={cn(
-          "relative inline-flex max-w-[calc(100vw-2rem)] overflow-hidden rounded-full border backdrop-blur-[24px] transition-[max-width,padding,box-shadow,background-color,transform,opacity] duration-700 [transition-timing-function:cubic-bezier(0.22,1,0.36,1)] sm:max-w-[calc(100vw-3rem)]",
+          "relative inline-flex items-center justify-center overflow-hidden whitespace-nowrap rounded-full border backdrop-blur-[24px] transition-[max-width,padding,box-shadow,background-color,transform,opacity] duration-700 [transition-timing-function:cubic-bezier(0.4,0,0.2,1)]",
           "h-14 sm:h-16",
           isGreetingVisible
             ? "translate-y-0 scale-100 opacity-100"
             : "translate-y-2 scale-[0.96] opacity-0",
-          isGreetingBreathing && !isExpanded && "nav-greeting-breathe",
+          isExpanded
+            ? "max-w-[calc(100vw-2rem)] sm:max-w-[calc(100vw-3rem)]"
+            : "max-w-[11.25rem] sm:max-w-[12rem]",
           isExpanded
             ? "px-5 sm:px-6"
-            : "px-6 sm:px-7",
+            : "px-4 sm:px-5",
           navTheme.shell,
           isScrolled
             ? "shadow-[0_18px_40px_-24px_rgba(15,23,42,0.26),0_0_0_1px_rgba(245,225,80,0.08)]"
@@ -193,10 +198,10 @@ const Navbar = ({ immersive = false }: NavbarProps) => {
         <div className="relative flex h-full items-center justify-center">
           <div
             className={cn(
-              "absolute inset-x-0 flex items-center justify-center transition-all duration-500 [transition-timing-function:cubic-bezier(0.22,1,0.36,1)]",
+              "absolute inset-x-0 flex items-center justify-center transition-opacity duration-300 [transition-timing-function:cubic-bezier(0.4,0,0.2,1)]",
               isExpanded
-                ? "translate-y-1 opacity-0"
-                : "translate-y-0 opacity-100"
+                ? "opacity-0"
+                : "opacity-100"
             )}
             aria-hidden={isExpanded}
           >
@@ -212,27 +217,39 @@ const Navbar = ({ immersive = false }: NavbarProps) => {
 
           <div
             className={cn(
-              "flex w-max items-center justify-between gap-3 transition-all duration-500 [transition-timing-function:cubic-bezier(0.22,1,0.36,1)] sm:gap-4",
-              isExpanded
-                ? "translate-y-0 opacity-100"
-                : "pointer-events-none translate-y-1 opacity-0"
+              "flex w-max items-center justify-between gap-3 sm:gap-4",
+              !isNavVisible && "pointer-events-none"
             )}
           >
             <nav className="flex min-w-0 items-center justify-center gap-1.5 sm:gap-2">
-              {navLinks.map((link) => {
+              {navLinks.map((link, index) => {
                 const targetSection = link.href.replace("#", "");
                 const isActive = activeSection === targetSection;
+                const isCta = "cta" in link;
 
                 return (
                   <a
                     key={link.name}
                     href={link.href}
                     className={cn(
-                      "rounded-full px-3.5 py-2 text-[0.84rem] font-medium tracking-[0.01em] transition-all duration-300 sm:px-4 sm:text-[0.9rem]",
-                      isActive
-                        ? `${navTheme.activeText} font-semibold`
-                        : `${navTheme.subtleText} ${navTheme.hover}`
+                      "rounded-full text-[0.84rem] font-medium tracking-[0.01em] opacity-0 transition-all duration-300 sm:text-[0.9rem]",
+                      isNavVisible && "nav-item-enter",
+                      isCta
+                        ? cn(
+                            "flex h-9 items-center px-4 transition-colors duration-200 ease-in-out sm:h-10 sm:px-[1.125rem]",
+                            navTheme.cta,
+                            isActive && "font-semibold"
+                          )
+                        : cn(
+                            "px-3.5 py-2 sm:px-4",
+                            isActive
+                              ? `${navTheme.activeText} font-semibold`
+                              : `${navTheme.subtleText} ${navTheme.hover}`
+                          )
                     )}
+                    style={{
+                      animationDelay: isNavVisible ? `${index * 55}ms` : "0ms",
+                    }}
                     onClick={(event) => {
                       event.preventDefault();
                       scrollToSection(link.href);
@@ -248,9 +265,13 @@ const Navbar = ({ immersive = false }: NavbarProps) => {
               type="button"
               onClick={() => setIsDarkMode((current) => !current)}
               className={cn(
-                "ml-1 flex h-9 w-9 shrink-0 items-center justify-center rounded-full border transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_12px_20px_-16px_rgba(15,23,42,0.26)] sm:h-10 sm:w-10",
+                "ml-1 flex h-9 w-9 shrink-0 items-center justify-center rounded-full border opacity-0 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_12px_20px_-16px_rgba(15,23,42,0.26)] sm:h-10 sm:w-10",
+                isNavVisible && "nav-item-enter",
                 navTheme.toggle
               )}
+              style={{
+                animationDelay: isNavVisible ? "240ms" : "0ms",
+              }}
               aria-label="Toggle dark mode"
             >
               {isDarkMode ? (

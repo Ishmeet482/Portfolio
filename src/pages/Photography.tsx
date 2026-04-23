@@ -200,9 +200,7 @@ const Photography = () => {
                 Selected Frames
               </h2>
             </div>
-            <p className="hidden max-w-md text-sm leading-6 text-charcoal/72 dark:text-offwhite/68 md:block">
-              A denser visual flow of scenes, textures, and moments arranged to feel more like a living gallery than a simple grid.
-            </p>
+            
           </div>
 
           <div className="relative z-10 grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">

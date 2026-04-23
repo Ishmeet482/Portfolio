@@ -93,7 +93,7 @@ const Footer = () => {
               onChange={(e) => setInputMessage(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleDraftEmail()}
               placeholder="Write a quick message…"
-              className="flex-1 min-w-0 bg-white/60 border border-black/[0.09] rounded-full px-6 py-3 text-sm text-charcoal placeholder:text-charcoal/35 outline-none focus:border-black/[0.18] focus:bg-white/85 focus:shadow-[0_0_0_3px_rgba(245,225,80,0.25)] transition-all duration-200 dark:bg-charcoal/25 dark:border-white/10 dark:text-offwhite dark:placeholder:text-offwhite/28 dark:focus:bg-charcoal/35"
+              className="footer-message-input flex-1 min-w-0 bg-white/60 border border-black/[0.09] rounded-full px-6 py-3 text-sm text-charcoal outline-none focus:border-black/[0.18] focus:bg-white/85 focus:shadow-[0_0_0_3px_rgba(245,225,80,0.25)] transition-all duration-200 dark:bg-charcoal/25 dark:border-white/10 dark:text-offwhite dark:focus:bg-charcoal/35"
             />
             <button
               onClick={handleDraftEmail}

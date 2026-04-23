@@ -223,7 +223,7 @@ const ProjectsSection = () => {
     <section id="projects" className="py-20">
       <Container size="large">
         <div ref={titleRef} className="section-enter mb-12">
-          <p className="text-charcoal/60 text-sm mb-2">from 2020 'til today</p>
+          <p className="text-charcoal/60 text-sm mb-2 dark:text-offwhite/55">from 2020 'til today</p>
           <h2 className="text-5xl md:text-6xl font-bold tracking-tight">My latest work</h2>
         </div>
 

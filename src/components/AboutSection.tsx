@@ -10,6 +10,7 @@ import {
   SkipBack,
   SkipForward,
   Volume2,
+  Shuffle,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 
@@ -247,13 +248,13 @@ const AboutSection = () => {
                   <Link
                     to="/photography"
                     aria-label="Open photography gallery"
-                    className="photography-card relative flex h-full w-full overflow-hidden rounded-[20px] border border-black/[0.08] shadow-[0_18px_48px_-24px_rgba(15,23,42,0.26)] transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_26px_56px_-22px_rgba(15,23,42,0.34)] dark:border-white/[0.09] dark:shadow-[0_18px_48px_-24px_rgba(0,0,0,0.55)]"
+                    className="photography-card relative flex h-full w-full overflow-hidden rounded-[24px] border border-black/[0.08] shadow-[0_18px_48px_-24px_rgba(15,23,42,0.26)] transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_26px_56px_-22px_rgba(15,23,42,0.34)] dark:border-white/[0.09] dark:shadow-[0_18px_48px_-24px_rgba(0,0,0,0.55)]"
                     onMouseEnter={pausePhotographyCarousel}
                     onMouseLeave={() => resumePhotographyCarousel()}
                     onTouchStart={pausePhotographyCarousel}
                     onTouchEnd={() => resumePhotographyCarousel(2200)}
                   >
-                    <div className="pointer-events-none absolute inset-[1px] z-10 rounded-[19px] border border-white/20 dark:border-white/[0.07]" />
+                    <div className="pointer-events-none absolute inset-[1px] z-10 rounded-[23px] border border-white/20 dark:border-white/[0.07]" />
 
                     {photographyCardImages.map((image, index) => (
                       <div
@@ -276,9 +277,14 @@ const AboutSection = () => {
                       <p className="text-[0.62rem] font-bold uppercase tracking-[0.16em] text-white/55"></p>
                       <p className="mt-0.5 text-sm font-semibold text-white/90"></p>
                     </div>
-                    <div className="absolute right-3 top-3 z-20 rounded-[10px] border border-white/25 bg-white/42 p-1.5 backdrop-blur-xl dark:border-white/10 dark:bg-black/30">
-                      <img src="/images/apple-photos.svg" alt="" aria-hidden className="h-5 w-5 object-contain" loading="eager" decoding="async" />
-                    </div>
+                    <img
+                      src="/images/apple-photos.svg"
+                      alt=""
+                      aria-hidden
+                      className="absolute right-4 top-4 z-20 h-9 w-9 object-contain opacity-90"
+                      loading="eager"
+                      decoding="async"
+                    />
                   </Link>
                 </div>
 
@@ -287,149 +293,169 @@ const AboutSection = () => {
                   className="group relative aspect-square overflow-hidden rounded-[24px] border shadow-[0_24px_58px_-30px_rgba(15,23,42,0.28)] transition-all duration-500 ease-out hover:-translate-y-1"
                   style={{
                     borderColor: isMusicPlaying ? "rgba(255,255,255,0.2)" : "rgba(0,0,0,0.08)",
-                    backgroundColor: isMusicPlaying ? currentTrack.accentColor : undefined,
-                    transition: "background-color 0.45s ease, border-color 0.45s ease, transform 0.5s ease, box-shadow 0.5s ease",
+                    background: isMusicPlaying
+                      ? `linear-gradient(180deg, ${currentTrack.accentColor} 0%, color-mix(in srgb, ${currentTrack.accentColor} 86%, #111827 14%) 100%)`
+                      : "linear-gradient(160deg, rgba(246,246,245,0.98), rgba(236,236,234,0.96))",
+                    transition: "background 0.45s ease, border-color 0.45s ease, transform 0.5s ease, box-shadow 0.5s ease",
                   }}
                 >
                   <audio ref={audioRef} preload="auto" />
 
-                  {/* Light-mode base fill — fades out when playing */}
                   <div
                     className="pointer-events-none absolute inset-0 rounded-[24px] transition-opacity duration-500"
                     style={{
-                      background: "linear-gradient(160deg, rgba(246,246,245,0.98), rgba(236,236,234,0.96))",
-                      opacity: isMusicPlaying ? 0 : 1,
+                      background: isMusicPlaying
+                        ? "linear-gradient(180deg, rgba(255,255,255,0.12), rgba(255,255,255,0.02))"
+                        : "radial-gradient(circle at top left, rgba(255,255,255,0.74), transparent 54%)",
+                      opacity: 1,
                     }}
                   />
 
-                  {/* Radial burst from top-right (music icon origin) */}
-                  <div
-                    className="pointer-events-none absolute"
-                    style={{
-                      top: "20px",
-                      right: "20px",
-                      width: "32px",
-                      height: "32px",
-                      borderRadius: "50%",
-                      backgroundColor: currentTrack.accentColor,
-                      transform: isMusicPlaying ? "scale(22)" : "scale(0)",
-                      transformOrigin: "center",
-                      transition: "transform 0.5s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.35s ease",
-                    }}
-                  />
-
-                  {/* Gloss overlay when playing */}
                   <div
                     className="pointer-events-none absolute inset-0 transition-opacity duration-500"
                     style={{
-                      background: "radial-gradient(ellipse at 80% 10%, rgba(255,255,255,0.22) 0%, transparent 55%)",
-                      opacity: isMusicPlaying ? 1 : 0,
+                      background: isMusicPlaying
+                        ? "radial-gradient(circle at 22% 18%, rgba(255,255,255,0.3), transparent 32%), radial-gradient(circle at 78% 100%, rgba(17,24,39,0.22), transparent 45%)"
+                        : "radial-gradient(circle at 84% 16%, rgba(255,255,255,0.55), transparent 28%)",
+                      opacity: isMusicPlaying ? 1 : 0.9,
                     }}
                   />
 
-                  {/* Inner border */}
+                  <div
+                    className="pointer-events-none absolute inset-0 transition-opacity duration-500"
+                    style={{
+                      boxShadow: isMusicPlaying
+                        ? "inset 0 1px 0 rgba(255,255,255,0.1)"
+                        : "inset 0 1px 0 rgba(255,255,255,0.8)",
+                      opacity: 1,
+                    }}
+                  />
+
                   <div
                     className="pointer-events-none absolute inset-[1px] rounded-[23px] border transition-colors duration-500"
                     style={{ borderColor: isMusicPlaying ? "rgba(255,255,255,0.18)" : "rgba(255,255,255,0.72)" }}
                   />
 
-                  {/* All content above the background layers */}
-                  <div className="relative z-10 flex h-full flex-col p-5">
-
-                    {/* Row 1 — Album art + music icon */}
-                    <div className="flex items-start justify-between">
-                      <div
-                        className="h-[68px] w-[68px] shrink-0 overflow-hidden rounded-[13px] border transition-all duration-500"
-                        style={{
-                          borderColor: isMusicPlaying ? "rgba(255,255,255,0.28)" : "rgba(0,0,0,0.1)",
-                          boxShadow: isMusicPlaying
-                            ? "0 10px 28px -10px rgba(0,0,0,0.45)"
-                            : "0 8px 20px -10px rgba(15,23,42,0.35)",
-                        }}
-                      >
-                        <img
-                          key={currentTrack.id}
-                          src={currentTrack.albumArtUrl}
-                          alt={`${currentTrack.title} album artwork`}
-                          className="h-full w-full object-cover transition-transform duration-500"
-                          style={{ transform: isMusicPlaying ? "scale(1.08)" : "scale(1)" }}
-                        />
+                  <div className="relative z-10 flex h-full flex-col justify-between overflow-hidden px-4 pb-6 pt-4 sm:px-5 sm:pb-6 sm:pt-5">
+                    <div className="flex min-h-[104px] shrink-0 items-start justify-between">
+                      <div className="flex flex-col">
+                          <div
+                            className="h-[86px] w-[86px] shrink-0 overflow-hidden rounded-[18px] border transition-all duration-500"
+                            style={{
+                              borderColor: isMusicPlaying ? "rgba(255,255,255,0.28)" : "rgba(0,0,0,0.1)",
+                              boxShadow: isMusicPlaying
+                                ? "0 18px 36px -18px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.1)"
+                                : "0 14px 32px -18px rgba(15,23,42,0.34), inset 0 1px 0 rgba(255,255,255,0.75)",
+                            }}
+                          >
+                            <img
+                              key={currentTrack.id}
+                              src={currentTrack.albumArtUrl}
+                              alt={`${currentTrack.title} album artwork`}
+                              className="h-full w-full object-cover transition-transform duration-500"
+                              style={{ transform: isMusicPlaying ? "scale(1.08)" : "scale(1)" }}
+                            />
+                          </div>
                       </div>
 
-                      <div
-                        className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border backdrop-blur-sm transition-all duration-500"
-                        style={{
-                          borderColor: isMusicPlaying ? "rgba(255,255,255,0.28)" : "rgba(0,0,0,0.1)",
-                          backgroundColor: isMusicPlaying ? "rgba(255,255,255,0.18)" : "rgba(255,255,255,0.72)",
-                          color: isMusicPlaying ? "#ffffff" : "#141414",
-                        }}
+                      <img
+                        src="/images/Apple-music.svg"
+                        alt=""
                         aria-hidden="true"
-                      >
-                        <img src="/images/Apple-music.svg" className="h-4 w-4" />
+                        className="h-9 w-9 shrink-0 object-contain opacity-90 transition-opacity duration-500"
+                      />
+                    </div>
+
+                    <div className="flex min-h-[80px] shrink-0 flex-col justify-start pt-2">
+                      <div className="mb-4 w-full space-y-1.5">
+                        <p
+                          className="text-[1.04rem] font-semibold leading-[1.15] tracking-[-0.02em] transition-colors duration-500"
+                          style={{ color: isMusicPlaying ? "#ffffff" : "#141414" }}
+                        >
+                          {currentTrack.title}
+                        </p>
+                        <p
+                          className="text-[0.74rem] leading-snug transition-colors duration-500"
+                          style={{ color: isMusicPlaying ? "rgba(255,255,255,0.74)" : "rgba(20,20,20,0.5)" }}
+                        >
+                          {currentTrack.artist}
+                        </p>
                       </div>
                     </div>
 
-                    {/* Row 2 — Track info */}
-                    <div className="flex flex-1 flex-col justify-center">
-                      <p
-                        className="text-[0.95rem] font-bold leading-tight transition-colors duration-500"
-                        style={{ color: isMusicPlaying ? "#ffffff" : "#141414" }}
-                      >
-                        {currentTrack.title}
-                      </p>
-                      <p
-                        className="mt-[5px] text-[0.72rem] leading-snug transition-colors duration-500"
-                        style={{ color: isMusicPlaying ? "rgba(255,255,255,0.68)" : "rgba(20,20,20,0.5)" }}
-                      >
-                        {currentTrack.artist}
-                      </p>
-                    </div>
-
-                    {/* Row 3 — Playback controls */}
-                    <div className="flex items-center justify-center gap-1">
-                      <button
-                        type="button"
-                        onClick={playPreviousTrack}
-                        className="flex h-10 w-10 items-center justify-center rounded-full transition-all duration-300 hover:scale-110 active:scale-95"
-                        style={{ color: isMusicPlaying ? "rgba(255,255,255,0.82)" : "rgba(20,20,20,0.62)" }}
-                        aria-label="Previous track"
-                      >
-                        <SkipBack size={17} fill="currentColor" />
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={toggleMusicPlayback}
-                        aria-pressed={isMusicPlaying}
-                        aria-label={isMusicPlaying ? "Pause" : "Play"}
-                        className="flex h-12 w-12 items-center justify-center rounded-full border shadow-md transition-all duration-300 hover:scale-105 active:scale-95"
+                    <div className="min-h-[60px] shrink-0 overflow-hidden pt-2">
+                      <div
+                        className="relative mx-auto flex h-[48px] w-[86%] items-center justify-center gap-2 rounded-full border px-3 py-1 transition-all duration-500"
                         style={{
-                          borderColor: isMusicPlaying ? "rgba(255,255,255,0.3)" : "rgba(0,0,0,0.12)",
-                          backgroundColor: isMusicPlaying ? "#ffffff" : "#141414",
-                          color: isMusicPlaying ? currentTrack.accentColor : "#ffffff",
+                          borderColor: isMusicPlaying ? "rgba(255,255,255,0.14)" : "rgba(0,0,0,0.08)",
+                          backgroundColor: isMusicPlaying ? "rgba(111, 25, 25, 0.28)" : "rgba(221,221,218,0.82)",
                           boxShadow: isMusicPlaying
-                            ? "0 8px 24px -8px rgba(0,0,0,0.35)"
-                            : "0 8px 24px -8px rgba(0,0,0,0.5)",
+                            ? "inset 0 2px 10px rgba(0,0,0,0.22), inset 0 1px 0 rgba(255,255,255,0.06)"
+                            : "inset 0 2px 10px rgba(15,23,42,0.08), inset 0 1px 0 rgba(255,255,255,0.62)",
                         }}
                       >
-                        {isMusicPlaying ? (
-                          <Pause size={19} fill="currentColor" />
-                        ) : (
-                          <Play size={19} fill="currentColor" className="ml-0.5" />
-                        )}
-                      </button>
+                        <div
+                          className="pointer-events-none absolute inset-[1px] rounded-full"
+                          style={{
+                            boxShadow: isMusicPlaying
+                              ? "inset 0 1px 0 rgba(255,255,255,0.08)"
+                              : "inset 0 1px 0 rgba(255,255,255,0.5)",
+                          }}
+                        />
+                        <button
+                          type="button"
+                          className="relative z-10 flex h-8 w-8 items-center justify-center rounded-full transition-all duration-300 hover:scale-105 active:scale-95"
+                          style={{ color: isMusicPlaying ? "rgba(255,255,255,0.7)" : "rgba(20,20,20,0.52)" }}
+                          aria-label="Shuffle"
+                        >
+                          <Shuffle size={15} />
+                        </button>
 
-                      <button
-                        type="button"
-                        onClick={playNextTrack}
-                        className="flex h-10 w-10 items-center justify-center rounded-full transition-all duration-300 hover:scale-110 active:scale-95"
-                        style={{ color: isMusicPlaying ? "rgba(255,255,255,0.82)" : "rgba(20,20,20,0.62)" }}
-                        aria-label="Next track"
-                      >
-                        <SkipForward size={17} fill="currentColor" />
-                      </button>
+                        <button
+                          type="button"
+                          onClick={playPreviousTrack}
+                          className="relative z-10 flex h-8 w-8 items-center justify-center rounded-full transition-all duration-300 hover:scale-105 active:scale-95"
+                          style={{ color: isMusicPlaying ? "rgba(255,255,255,0.84)" : "rgba(20,20,20,0.62)" }}
+                          aria-label="Previous track"
+                        >
+                          <SkipBack size={15} fill="currentColor" />
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={toggleMusicPlayback}
+                          aria-pressed={isMusicPlaying}
+                          aria-label={isMusicPlaying ? "Pause" : "Play"}
+                          className="relative z-10 flex h-8 w-8 items-center justify-center rounded-full transition-all duration-300 hover:scale-105 active:scale-95"
+                          style={{ color: isMusicPlaying ? "#ffffff" : "#141414" }}
+                        >
+                          {isMusicPlaying ? (
+                            <Pause size={15} fill="currentColor" />
+                          ) : (
+                            <Play size={15} fill="currentColor" className="ml-0.5" />
+                          )}
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={playNextTrack}
+                          className="relative z-10 flex h-8 w-8 items-center justify-center rounded-full transition-all duration-300 hover:scale-105 active:scale-95"
+                          style={{ color: isMusicPlaying ? "rgba(255,255,255,0.84)" : "rgba(20,20,20,0.62)" }}
+                          aria-label="Next track"
+                        >
+                          <SkipForward size={15} fill="currentColor" />
+                        </button>
+
+                        <button
+                          type="button"
+                          className="relative z-10 flex h-8 w-8 items-center justify-center rounded-full transition-all duration-300 hover:scale-105 active:scale-95"
+                          style={{ color: isMusicPlaying ? "rgba(255,255,255,0.78)" : "rgba(20,20,20,0.54)" }}
+                          aria-label="Volume"
+                        >
+                          <Volume2 size={15} />
+                        </button>
+                      </div>
                     </div>
-
                   </div>
                 </div>
               </div>

@@ -58,7 +58,7 @@ const categories: TechCategory[] = [
       { name: "PostgreSQL", logo: si("postgresql") },
       { name: "MongoDB",    logo: si("mongodb") },
       { name: "Redis",      logo: si("redis") },
-      { name: "mysql",      logo: si("mysql") },
+      { name: "MySQL",      logo: si("mysql") },
       { name: "VS Code",    logo: si("visualstudiocode") },
       { name: "Postman",    logo: si("postman") },
     ],
