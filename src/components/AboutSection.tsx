@@ -336,11 +336,11 @@ const AboutSection = () => {
                     style={{ borderColor: isMusicPlaying ? "rgba(255,255,255,0.18)" : "rgba(255,255,255,0.72)" }}
                   />
 
-                  <div className="relative z-10 flex h-full flex-col justify-between overflow-hidden px-4 pb-6 pt-4 sm:px-5 sm:pb-6 sm:pt-5">
-                    <div className="flex min-h-[104px] shrink-0 items-start justify-between">
+                  <div className="relative z-10 flex h-full flex-col justify-between overflow-hidden px-4 pb-6 pt-4 sm:px-5 sm:pb-6 sm:pt-5 max-[768px]:px-3 max-[768px]:pb-4 max-[768px]:pt-3">
+                    <div className="flex min-h-[104px] shrink-0 items-start justify-between max-[768px]:min-h-[88px]">
                       <div className="flex flex-col">
                           <div
-                            className="h-[86px] w-[86px] shrink-0 overflow-hidden rounded-[18px] border transition-all duration-500"
+                            className="h-[86px] w-[86px] shrink-0 overflow-hidden rounded-[18px] border transition-all duration-500 max-[768px]:h-[68px] max-[768px]:w-[68px] max-[768px]:rounded-[16px]"
                             style={{
                               borderColor: isMusicPlaying ? "rgba(255,255,255,0.28)" : "rgba(0,0,0,0.1)",
                               boxShadow: isMusicPlaying
@@ -362,20 +362,20 @@ const AboutSection = () => {
                         src="/images/Apple-music.svg"
                         alt=""
                         aria-hidden="true"
-                        className="h-9 w-9 shrink-0 object-contain opacity-90 transition-opacity duration-500"
+                        className="h-9 w-9 shrink-0 object-contain opacity-90 transition-opacity duration-500 max-[768px]:h-7 max-[768px]:w-7"
                       />
                     </div>
 
-                    <div className="flex min-h-[80px] shrink-0 flex-col justify-start pt-2">
-                      <div className="mb-4 w-full space-y-1.5">
+                    <div className="flex min-h-[80px] shrink-0 flex-col justify-start pt-2 max-[768px]:min-h-[64px] max-[768px]:pt-1.5">
+                      <div className="mb-4 w-full space-y-1.5 max-[768px]:mb-3 max-[768px]:space-y-1">
                         <p
-                          className="text-[1.04rem] font-semibold leading-[1.15] tracking-[-0.02em] transition-colors duration-500"
+                          className="text-[1.04rem] font-semibold leading-[1.15] tracking-[-0.02em] transition-colors duration-500 max-[768px]:text-[0.9rem]"
                           style={{ color: isMusicPlaying ? "#ffffff" : "#141414" }}
                         >
                           {currentTrack.title}
                         </p>
                         <p
-                          className="text-[0.74rem] leading-snug transition-colors duration-500"
+                          className="text-[0.74rem] leading-snug transition-colors duration-500 max-[768px]:text-[0.64rem]"
                           style={{ color: isMusicPlaying ? "rgba(255,255,255,0.74)" : "rgba(20,20,20,0.5)" }}
                         >
                           {currentTrack.artist}
@@ -383,9 +383,9 @@ const AboutSection = () => {
                       </div>
                     </div>
 
-                    <div className="min-h-[60px] shrink-0 overflow-hidden pt-2">
+                    <div className="min-h-[60px] shrink-0 overflow-hidden pt-2 max-[768px]:min-h-[52px] max-[768px]:pt-1">
                       <div
-                        className="relative mx-auto flex h-[48px] w-[86%] items-center justify-center gap-2 rounded-full border px-3 py-1 transition-all duration-500"
+                        className="relative mx-auto flex h-[48px] w-[86%] items-center justify-center gap-2 rounded-full border px-3 py-1 transition-all duration-500 max-[768px]:h-[40px] max-[768px]:w-[90%] max-[768px]:gap-1 max-[768px]:px-2"
                         style={{
                           borderColor: isMusicPlaying ? "rgba(255,255,255,0.14)" : "rgba(0,0,0,0.08)",
                           backgroundColor: isMusicPlaying ? "rgba(111, 25, 25, 0.28)" : "rgba(221,221,218,0.82)",
@@ -404,21 +404,21 @@ const AboutSection = () => {
                         />
                         <button
                           type="button"
-                          className="relative z-10 flex h-8 w-8 items-center justify-center rounded-full transition-all duration-300 hover:scale-105 active:scale-95"
+                          className="relative z-10 flex h-8 w-8 items-center justify-center rounded-full transition-all duration-300 hover:scale-105 active:scale-95 max-[768px]:h-[26px] max-[768px]:w-[26px]"
                           style={{ color: isMusicPlaying ? "rgba(255,255,255,0.7)" : "rgba(20,20,20,0.52)" }}
                           aria-label="Shuffle"
                         >
-                          <Shuffle size={15} />
+                          <Shuffle size={15} className="max-[768px]:h-[14px] max-[768px]:w-[14px]" />
                         </button>
 
                         <button
                           type="button"
                           onClick={playPreviousTrack}
-                          className="relative z-10 flex h-8 w-8 items-center justify-center rounded-full transition-all duration-300 hover:scale-105 active:scale-95"
+                          className="relative z-10 flex h-8 w-8 items-center justify-center rounded-full transition-all duration-300 hover:scale-105 active:scale-95 max-[768px]:h-[26px] max-[768px]:w-[26px]"
                           style={{ color: isMusicPlaying ? "rgba(255,255,255,0.84)" : "rgba(20,20,20,0.62)" }}
                           aria-label="Previous track"
                         >
-                          <SkipBack size={15} fill="currentColor" />
+                          <SkipBack size={15} fill="currentColor" className="max-[768px]:h-[14px] max-[768px]:w-[14px]" />
                         </button>
 
                         <button
@@ -426,33 +426,33 @@ const AboutSection = () => {
                           onClick={toggleMusicPlayback}
                           aria-pressed={isMusicPlaying}
                           aria-label={isMusicPlaying ? "Pause" : "Play"}
-                          className="relative z-10 flex h-8 w-8 items-center justify-center rounded-full transition-all duration-300 hover:scale-105 active:scale-95"
+                          className="relative z-10 flex h-8 w-8 items-center justify-center rounded-full transition-all duration-300 hover:scale-105 active:scale-95 max-[768px]:h-[26px] max-[768px]:w-[26px]"
                           style={{ color: isMusicPlaying ? "#ffffff" : "#141414" }}
                         >
                           {isMusicPlaying ? (
-                            <Pause size={15} fill="currentColor" />
+                            <Pause size={15} fill="currentColor" className="max-[768px]:h-[14px] max-[768px]:w-[14px]" />
                           ) : (
-                            <Play size={15} fill="currentColor" className="ml-0.5" />
+                            <Play size={15} fill="currentColor" className="ml-0.5 max-[768px]:h-[14px] max-[768px]:w-[14px]" />
                           )}
                         </button>
 
                         <button
                           type="button"
                           onClick={playNextTrack}
-                          className="relative z-10 flex h-8 w-8 items-center justify-center rounded-full transition-all duration-300 hover:scale-105 active:scale-95"
+                          className="relative z-10 flex h-8 w-8 items-center justify-center rounded-full transition-all duration-300 hover:scale-105 active:scale-95 max-[768px]:h-[26px] max-[768px]:w-[26px]"
                           style={{ color: isMusicPlaying ? "rgba(255,255,255,0.84)" : "rgba(20,20,20,0.62)" }}
                           aria-label="Next track"
                         >
-                          <SkipForward size={15} fill="currentColor" />
+                          <SkipForward size={15} fill="currentColor" className="max-[768px]:h-[14px] max-[768px]:w-[14px]" />
                         </button>
 
                         <button
                           type="button"
-                          className="relative z-10 flex h-8 w-8 items-center justify-center rounded-full transition-all duration-300 hover:scale-105 active:scale-95"
+                          className="relative z-10 flex h-8 w-8 items-center justify-center rounded-full transition-all duration-300 hover:scale-105 active:scale-95 max-[768px]:h-[26px] max-[768px]:w-[26px]"
                           style={{ color: isMusicPlaying ? "rgba(255,255,255,0.78)" : "rgba(20,20,20,0.54)" }}
                           aria-label="Volume"
                         >
-                          <Volume2 size={15} />
+                          <Volume2 size={15} className="max-[768px]:h-[14px] max-[768px]:w-[14px]" />
                         </button>
                       </div>
                     </div>
