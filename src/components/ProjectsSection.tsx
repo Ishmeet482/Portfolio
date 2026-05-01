@@ -2,18 +2,19 @@ import { useEffect, useRef, useState } from "react";
 import { X } from "lucide-react";
 import Container from "./ui-components/Container";
 import ProjectCard, { ProjectProps } from "./ProjectCard";
+import { DoodleUnderline, DoodleArrowDown, DoodleSmiley, DoodleLightbulb } from "./Doodles";
 
 const projects: ProjectProps[] = [
   {
     id: "Web3-AMM",
     title: "Decentralized AMM with NFT LP Positions",
     description: "An advanced AMM for the Sui blockchain featuring NFT-based liquidity tracking, dual pool types (StableSwap & constant product), and built-in slippage protection. Each liquidity deposit issues a non-fungible position NFT, enabling composable DeFi strategies on-chain.",
-    image: ["/images/SUI-AMM.png", "/images/SUI-2.png"],
+    image: ["/images/SUI.png", "/images/SUI-2.png"],
     tags: ["SUI", "Move", "Web3", "Blockchain"],
     liveUrl: "#",
     githubUrl: "https://github.com/Ishmeet482/Constant-Product-AMM",
     type: "Personal",
-    date: "2024",
+    date: "2025",
     learned: [
       "Applied Move’s resource model to create non-transferable LP NFTs that store position metadata such as share ratios and entry price directly on-chain.",
       "Designed a dual-pool router that routes swaps to StableSwap or constant-product pools based on token pair classification.",
@@ -28,12 +29,12 @@ const projects: ProjectProps[] = [
     id: "weather-etl",
     title: "Weather ETL Pipeline",
     description: "A production-grade ETL pipeline orchestrated with Apache Airflow that fetches real-time weather data from Open-Meteo, applies multi-step transformations, and loads normalized records into PostgreSQL — fully containerized with Docker Compose for repeatable local and cloud deployments.",
-    image: ["/images/ETL_1.jpg", "/images/ETL_2.jpg"],
+    image: ["/images/ETL_1.png", "/images/ETL_2.jpg"],
     tags: ["Apache Airflow", "PostgreSQL", "Docker", "Python"],
     liveUrl: "#",
     githubUrl: "https://github.com/Ishmeet482/ETL-Pipeline",
     type: "Personal",
-    date: "2023",
+    date: "2024",
     learned: [
       "Orchestrated multi-step Airflow DAGs using sensors and XCom to pass transformed data between tasks without relying on external state stores.",
       "Containerized the pipeline with Docker Compose, configuring PostgreSQL with persistent storage and enabling parallel execution via Airflow’s CeleryExecutor.",
@@ -48,12 +49,12 @@ const projects: ProjectProps[] = [
     id: "finance-backend",
     title: "Finance Data Processing & Access Control Backend",
     description: "A scalable FastAPI backend for a multi-role finance dashboard, enabling secure JWT-based RBAC, financial record management, and real-time analytics queries via RESTful APIs — documented with Swagger UI and stress-tested for sub-10ms response times under concurrent load.",
-    image: ["/images/Finance_Backend_API.png"],
+    image: ["/images/Finance_1.png"],
     tags: ["Python", "FastAPI", "SQLite", "JWT", "Swagger"],
     liveUrl: "#",
     githubUrl: "https://github.com/Ishmeet482/Finance-Data-Processing-and-Access-Control-Backend",
     type: "Personal",
-    date: "2023",
+    date: "2024",
     learned: [
       "Implemented JWT-based RBAC middleware in FastAPI using dependency injection chains for granular, endpoint-level permission enforcement.",
       "Structured a normalized SQLite schema supporting multi-role analytics queries while maintaining sub-10ms median response times under concurrent load.",
@@ -73,7 +74,27 @@ const projects: ProjectProps[] = [
     liveUrl: "https://colab.research.google.com/drive/1wozbz1pMo_j-EL4VZugymkWlycKgf1QG#scrollTo=SOhkontmOfo8",
     githubUrl: "https://github.com/Ishmeet482/User-Success-Prediction",
     type: "Personal",
-    date: "2023",
+    date: "2026",
+    learned: [
+      "Engineered domain-specific features (engagement decay scores, retention curves) that improved Random Forest accuracy by 18% over raw feature baselines.",
+      "Applied SHAP TreeExplainer to quantify per-feature contributions and identified the top 3 behavioral drivers for product roadmap prioritization.",
+      "Addressed class imbalance using SMOTE oversampling within cross-validation folds to prevent data leakage from synthetic minority samples.",
+    ],
+    challenges: [
+      "High feature correlation required iterative PCA analysis to reduce multicollinearity without discarding predictive signal from correlated engagement metrics.",
+      "Translating probabilistic model outputs into actionable binary thresholds demanded calibration curves and precision-recall trade-off analysis with stakeholders.",
+    ],
+  },
+  {
+    id: "media",
+    title: "Media Database Showcase",
+    description: "A media tracker that showcases my watched movies and series with real-time API integration, built to explore and learn frontend development.",
+    image: ["/images/MEDIA.png"],
+    tags: ["Vite", "Typescript", "API"],
+    liveUrl: "https://media-database.vercel.app/",
+    githubUrl: "https://github.com/Ishmeet482/Media-database",
+    type: "Personal",
+    date: "2026",
     learned: [
       "Engineered domain-specific features (engagement decay scores, retention curves) that improved Random Forest accuracy by 18% over raw feature baselines.",
       "Applied SHAP TreeExplainer to quantify per-feature contributions and identified the top 3 behavioral drivers for product roadmap prioritization.",
@@ -93,7 +114,7 @@ const projects: ProjectProps[] = [
     liveUrl: "https://sui-lootbox-system.vercel.app/",
     githubUrl: "https://github.com/Ishmeet482/SUI-Lootbox-System",
     type: "Personal",
-    date: "2024",
+    date: "2026",
     learned: [
       "Leveraged Sui Move's on-chain randomness beacon for tamper-proof rarity draws, eliminating the need for an off-chain oracle.",
       "Designed configurable rarity tiers as Move constants, enabling tier probabilities to be updated via admin-only transactions without redeploying the module.",
@@ -112,7 +133,7 @@ const projects: ProjectProps[] = [
     liveUrl: "#",
     githubUrl: "https://github.com/Ishmeet482/URL-shortener-with-FastAPI",
     type: "Personal",
-    date: "2023",
+    date: "2024",
     learned: [
       "Generated collision-resistant short codes using base62 encoding of ULID timestamps, enabling lexicographic ordering without a separate counter column.",
       "Implemented click analytics with SQLite aggregation queries optimized via composite (short_code, created_at) indexes for sub-millisecond redirect resolution.",
@@ -130,7 +151,7 @@ const projects: ProjectProps[] = [
     liveUrl: "#",
     githubUrl: "https://github.com/Ishmeet482/Intent-Based-Chatbot-with-LLM-Fallback",
     type: "Personal",
-    date: "2023",
+    date: "2025",
     learned: [
       "Built a two-stage pipeline: TF-IDF cosine similarity for sub-5ms local matching, with automatic escalation to the remote HuggingFace LLM when confidence dropped below threshold.",
       "Deployed the inference server on a cloud VM using FastAPI, isolating model memory from the bot process and enabling independent scaling.",
@@ -220,15 +241,27 @@ const ProjectsSection = () => {
   }, [isOverlayOpen]);
   
   return (
-    <section id="projects" className="py-20">
+    <section id="projects" className="py-20 relative">
+      {/* Left margin doodle */}
+      <DoodleLightbulb className="absolute left-4 top-40 h-10 w-8 hidden 2xl:block" />
+      
+      {/* Right margin doodle */}
+      <DoodleSmiley className="absolute right-6 top-1/3 h-10 w-10 hidden 2xl:block" />
+      
       <Container size="large">
-        <div ref={titleRef} className="section-enter mb-12">
+        <div ref={titleRef} className="section-enter mb-12 relative">
           <p className="text-charcoal/60 text-sm mb-2 dark:text-offwhite/55">from 2020 'til today</p>
-          <h2 className="text-5xl md:text-6xl font-bold tracking-tight">My latest work</h2>
+          <h2 className="text-5xl md:text-6xl font-bold tracking-tight relative inline-block">
+            My latest work
+            {/* Hand-drawn underline */}
+            <DoodleUnderline className="absolute -bottom-2 left-0 w-[85%] h-3" />
+          </h2>
+          {/* Arrow pointing down to projects */}
+          <DoodleArrowDown className="absolute -right-4 top-8 h-12 w-6 rotate-12 doodle-float hidden lg:block" />
         </div>
 
         <div ref={sectionRef} className="section-enter w-full">
-          <div className="flex w-full flex-col gap-7">
+          <div className="flex w-full flex-col gap-10 md:gap-12">
             {featuredProjects.map((project, idx) => (
               <ProjectCard key={project.id} {...project} index={idx} />
             ))}
@@ -268,11 +301,11 @@ const ProjectsSection = () => {
           onClick={() => setIsOverlayOpen(false)}
         >
           <div
-            className="mx-auto flex h-full max-w-4xl flex-col px-4 py-4 sm:px-6 sm:py-6"
+            className="mx-auto flex h-full max-w-6xl flex-col px-4 py-4 sm:px-8 sm:py-8 lg:px-12"
             onClick={(event) => event.stopPropagation()}
           >
-            <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-[2rem] border border-black/10 bg-[linear-gradient(145deg,rgba(255,249,229,0.96),rgba(255,255,255,0.9))] shadow-[0_38px_90px_-42px_rgba(15,23,42,0.38)] dark:border-offwhite/10 dark:bg-[linear-gradient(145deg,rgba(40,36,46,0.97),rgba(30,28,34,0.95))] dark:shadow-[0_38px_90px_-40px_rgba(0,0,0,0.72)]">
-              <div className="flex items-start justify-between gap-6 border-b border-black/8 px-6 py-5 dark:border-offwhite/10 sm:px-8">
+            <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-[2rem] border border-black/10 bg-[linear-gradient(145deg,rgba(255,249,229,0.96),rgba(255,255,255,0.9))] shadow-[0_38px_90px_-42px_rgba(15,23,42,0.38)] backdrop-blur-xl dark:border-offwhite/10 dark:bg-[linear-gradient(145deg,rgba(40,36,46,0.97),rgba(30,28,34,0.95))] dark:shadow-[0_38px_90px_-40px_rgba(0,0,0,0.72)]">
+              <div className="flex items-start justify-between gap-6 border-b border-black/8 px-8 py-6 dark:border-offwhite/10 sm:px-10">
                 <div>
                   <p className="mb-1.5 text-xs font-semibold uppercase tracking-widest text-charcoal/45 dark:text-offwhite/45">
                     Project Archive
@@ -291,8 +324,8 @@ const ProjectsSection = () => {
                 </button>
               </div>
 
-              <div className="min-h-0 flex-1 overflow-y-auto px-6 py-6 sm:px-8 sm:py-8">
-                <div className="flex flex-col gap-6">
+              <div className="min-h-0 flex-1 overflow-y-auto px-8 py-8 sm:px-10 sm:py-10">
+                <div className="flex flex-col gap-10">
                   {projects.map((project, idx) => (
                     <ProjectCard key={project.id} {...project} index={idx} compact />
                   ))}

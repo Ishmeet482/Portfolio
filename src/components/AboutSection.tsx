@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from "react";
 import Container from "./ui-components/Container";
 import {
   ExternalLink,
-  Music,
   Clapperboard,
   Gamepad,
   Play,
@@ -10,15 +9,17 @@ import {
   SkipBack,
   SkipForward,
   Volume2,
-  Shuffle,
+  VolumeX,
 } from "lucide-react";
 import { Link } from "react-router-dom";
+import { DoodleBracket, DoodleCoffee, DoodleMusicNote, DoodleCloud } from "./Doodles";
 
 const photographyCardImages = [
   { src: "/images/Photography/6.jpg", alt: "Rocky shoreline at the beach" },
-  { src: "/images/Photography/1.jpeg", alt: "Mountain sunset and open sky" },
-  { src: "/images/Photography/9.jpeg", alt: "Namma Metro moving through the city" },
-  { src: "/images/Photography/5.jpeg", alt: "Night flight viewed against the sky" },
+  { src: "/images/Photography/16.jpg", alt: "Mountain sunset and open sky" },
+  { src: "/images/Photography/23.jpg", alt: "Namma Metro moving through the city" },
+  { src: "/images/Photography/35.jpg", alt: "Night flight viewed against the sky" },
+  { src: "/images/Photography/32.jpg", alt: "Night flight viewed against the sky" },
 ];
 
 const mediaItems = [
@@ -66,6 +67,46 @@ const playlist: Track[] = [
     albumArtUrl: "/audio/niewaz.jpg",
     audioUrl: "/audio/Niewazne.mp3",
     accentColor: "#6b21a8",
+  }, 
+  {
+    id: "4",
+    title: "Soldier's Eye",
+    artist: "Days Gone",
+    albumArtUrl: "/audio/Soldier's eye.jpg",
+    audioUrl: "/audio/soldier's eye.mp3",
+    accentColor: "#6b21a8",
+  },
+  {
+    id: "5",
+    title: "Suzume",
+    artist: "Kei",
+    albumArtUrl: "/audio/suzume.jpeg",
+    audioUrl: "/audio/suzume.mp3",
+    accentColor: "#6b21a8",
+  },
+  {
+    id: "6",
+    title: "Whenever",
+    artist: "Conor Meyyard",
+    albumArtUrl: "/audio/whenever.jpeg",
+    audioUrl: "/audio/whenever.mp3",
+    accentColor: "#6b21a8",
+  },
+  {
+    id: "7",
+    title: "Solo",
+    artist: "Clean Bandit",
+    albumArtUrl: "/audio/Solo.jpg",
+    audioUrl: "/audio/solo.mp3",
+    accentColor: "#6b21a8",
+  },
+  {
+    id: "8",
+    title: "Promise Not To Fall",
+    artist: "13 Reasons Why OST",
+    albumArtUrl: "/audio/Promise.jpg",
+    audioUrl: "/audio/promise.mp3",
+    accentColor: "#6b21a8",
   },
 ];
 
@@ -76,19 +117,36 @@ const AboutSection = () => {
   const [isPhotographyCarouselPaused, setIsPhotographyCarouselPaused] = useState(false);
   const [currentTrackIndex, setCurrentTrackIndex] = useState(0);
   const [isMusicPlaying, setIsMusicPlaying] = useState(false);
+  const [volume, setVolume] = useState(0.7);
+  const [isMuted, setIsMuted] = useState(false);
+  const [showVolumeSlider, setShowVolumeSlider] = useState(false);
   const photographyResumeTimeoutRef = useRef<number | null>(null);
 
   const currentTrack = playlist[currentTrackIndex];
   const isPlayingRef = useRef(false);
 
-  // Mount: wire up ended/error listeners once
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio) return;
     audio.src = playlist[0].audioUrl;
-    const onEnded = () => { isPlayingRef.current = false; setIsMusicPlaying(false); };
+    const onEnded = () => {
+      setCurrentTrackIndex((current) => {
+        const nextIndex = (current + 1) % playlist.length;
+        audio.src = playlist[nextIndex].audioUrl;
+        audio.load();
+        audio.play()
+          .then(() => {
+            isPlayingRef.current = true;
+            setIsMusicPlaying(true);
+          })
+          .catch(() => {
+            isPlayingRef.current = false;
+            setIsMusicPlaying(false);
+          });
+        return nextIndex;
+      });
+    };
     const onError = () => {
-      // MEDIA_ERR_ABORTED (code 1) fires when src is changed mid-load — safe to ignore
       if (audio.error?.code === 1) return;
       isPlayingRef.current = false;
       setIsMusicPlaying(false);
@@ -122,11 +180,9 @@ const AboutSection = () => {
     audio.load();
     setCurrentTrackIndex(nextIndex);
     if (wasPlaying) {
-      // Mark as playing before the async call so rapid track changes stay consistent
       isPlayingRef.current = true;
       setIsMusicPlaying(true);
       audio.play().catch((err: Error) => {
-        // AbortError is expected when tracks are changed rapidly — don't reset state
         if (err.name === "AbortError") return;
         isPlayingRef.current = false;
         setIsMusicPlaying(false);
@@ -136,6 +192,56 @@ const AboutSection = () => {
 
   const playNextTrack = () => changeTrack(1);
   const playPreviousTrack = () => changeTrack(-1);
+
+  const handleVolumeChange = (newVolume: number) => {
+    const audio = audioRef.current;
+    if (!audio) return;
+    setVolume(newVolume);
+    audio.volume = newVolume;
+    if (newVolume === 0) {
+      setIsMuted(true);
+    } else if (isMuted) {
+      setIsMuted(false);
+    }
+  };
+
+  const toggleMute = () => {
+    const audio = audioRef.current;
+    if (!audio) return;
+    if (isMuted) {
+      audio.volume = volume || 0.7;
+      setIsMuted(false);
+    } else {
+      audio.volume = 0;
+      setIsMuted(true);
+    }
+  };
+
+  const selectTrack = (nextIndex: number) => {
+    const audio = audioRef.current;
+    if (!audio) return;
+    const nextTrack = playlist[nextIndex];
+    const isSameTrack = nextIndex === currentTrackIndex;
+
+    if (isSameTrack) {
+      toggleMusicPlayback();
+      return;
+    }
+
+    audio.pause();
+    audio.src = nextTrack.audioUrl;
+    audio.load();
+    setCurrentTrackIndex(nextIndex);
+    audio.play()
+      .then(() => {
+        isPlayingRef.current = true;
+        setIsMusicPlaying(true);
+      })
+      .catch(() => {
+        isPlayingRef.current = false;
+        setIsMusicPlaying(false);
+      });
+  };
 
   useEffect(() => {
     if (isPhotographyCarouselPaused) return;
@@ -180,14 +286,28 @@ const AboutSection = () => {
   }, []);
 
   return (
-    <section id="about" className="py-20 bg-yellow-light dark:bg-charcoal-dark">
+    <section id="about" className="py-20 relative">
+      {/* Left margin doodle */}
+      <DoodleCoffee className="absolute left-4 top-32 h-10 w-9 hidden 2xl:block" />
+      
+      {/* Right margin doodles */}
+      <DoodleMusicNote className="absolute right-5 top-1/4 h-9 w-7 hidden 2xl:block" />
+      <DoodleCloud className="absolute right-4 bottom-1/3 h-8 w-14 hidden 2xl:block" />
+      
       <Container size="large">
         <div ref={sectionRef} className="section-enter">
           <div className="grid grid-cols-1 lg:grid-cols-[52fr_48fr] gap-10 items-stretch">
 
             {/* ── LEFT: Editorial Story Panel ── */}
-            <div className="relative h-full overflow-hidden rounded-[24px] border border-black/[0.08] bg-[linear-gradient(160deg,rgba(255,255,255,0.92),rgba(255,252,245,0.82))] p-8 lg:p-10 shadow-[0_28px_72px_-44px_rgba(15,23,42,0.16)] dark:border-offwhite/10 dark:bg-[linear-gradient(160deg,rgba(42,38,47,0.92),rgba(32,29,37,0.88))]">
-              <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.68),transparent_44%)] dark:bg-[radial-gradient(circle_at_top_left,rgba(245,225,80,0.07),transparent_44%)]" />
+            <div className="relative h-full overflow-hidden rounded-[24px] border border-white/[0.5] bg-white/[0.45] p-8 lg:p-10 backdrop-blur-xl backdrop-saturate-[1.6] shadow-[0_8px_32px_-8px_rgba(0,0,0,0.1),0_24px_60px_-20px_rgba(0,0,0,0.12),inset_0_1px_0_rgba(255,255,255,0.8),inset_0_-1px_0_rgba(0,0,0,0.03)] dark:border-white/[0.12] dark:bg-white/[0.06] dark:shadow-[0_8px_32px_-8px_rgba(0,0,0,0.4),0_24px_60px_-20px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(255,255,255,0.1),inset_0_-1px_0_rgba(0,0,0,0.2)]">
+              {/* Frosted glass highlight layer */}
+              <div className="pointer-events-none absolute inset-0 rounded-[24px] bg-[radial-gradient(ellipse_80%_50%_at_20%_-10%,rgba(255,255,255,0.7),transparent_50%)] dark:bg-[radial-gradient(ellipse_80%_50%_at_20%_-10%,rgba(255,255,255,0.08),transparent_50%)]" />
+              {/* Subtle noise texture for glass effect */}
+              <div className="pointer-events-none absolute inset-0 rounded-[24px] opacity-[0.015] dark:opacity-[0.03]" style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E\")" }} />
+              {/* Bottom edge glow */}
+              <div className="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-white/40 to-transparent dark:via-white/10" />
+              {/* Decorative bracket doodle */}
+              <DoodleBracket className="absolute right-6 top-20 h-14 w-5 opacity-60 hidden lg:block" />
               <h2 className="mb-10 text-[2.4rem] font-bold tracking-tight text-charcoal dark:text-offwhite">
                 What I'm about.
               </h2>
@@ -238,230 +358,83 @@ const AboutSection = () => {
               </div>
             </div>
 
-            {/* ── RIGHT: Layered Vertical Stack ── */}
-            <div className="flex h-full flex-col gap-2.5">
+            {/* ── RIGHT: Layered Grid Stack ── */}
+            <div className="grid h-full w-full grid-cols-2 grid-rows-[auto_1fr_1fr] gap-2.5">
 
-              {/* ── TOP LAYER: Gallery + Music (Two Equal Squares) ── */}
-              <div className="grid grid-cols-2 gap-2.5">
-                {/* Gallery Card (Square) */}
-                <div className="group relative aspect-square">
-                  <Link
-                    to="/photography"
-                    aria-label="Open photography gallery"
-                    className="photography-card relative flex h-full w-full overflow-hidden rounded-[24px] border border-black/[0.08] shadow-[0_18px_48px_-24px_rgba(15,23,42,0.26)] transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_26px_56px_-22px_rgba(15,23,42,0.34)] dark:border-white/[0.09] dark:shadow-[0_18px_48px_-24px_rgba(0,0,0,0.55)]"
-                    onMouseEnter={pausePhotographyCarousel}
-                    onMouseLeave={() => resumePhotographyCarousel()}
-                    onTouchStart={pausePhotographyCarousel}
-                    onTouchEnd={() => resumePhotographyCarousel(2200)}
-                  >
-                    <div className="pointer-events-none absolute inset-[1px] z-10 rounded-[23px] border border-white/20 dark:border-white/[0.07]" />
-
-                    {photographyCardImages.map((image, index) => (
-                      <div
-                        key={image.src}
-                        className="absolute inset-0 transition-opacity duration-[1100ms] ease-in-out"
-                        style={{ opacity: index === activePhotographyIndex % photographyCardImages.length ? 1 : 0 }}
-                      >
-                        <img
-                          src={image.src}
-                          alt={image.alt}
-                          loading="eager"
-                          decoding="async"
-                          className="h-full w-full object-cover"
-                        />
-                      </div>
-                    ))}
-
-                    <div className="pointer-events-none absolute inset-0 z-10 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
-                    <div className="absolute bottom-4 left-4 z-20">
-                      <p className="text-[0.62rem] font-bold uppercase tracking-[0.16em] text-white/55"></p>
-                      <p className="mt-0.5 text-sm font-semibold text-white/90"></p>
-                    </div>
-                    <img
-                      src="/images/apple-photos.svg"
-                      alt=""
-                      aria-hidden
-                      className="absolute right-4 top-4 z-20 h-9 w-9 object-contain opacity-90"
-                      loading="eager"
-                      decoding="async"
-                    />
-                  </Link>
-                </div>
-
-                {/* Music Player Card (Square) */}
-                <div
-                  className="group relative aspect-square overflow-hidden rounded-[24px] border shadow-[0_24px_58px_-30px_rgba(15,23,42,0.28)] transition-all duration-500 ease-out hover:-translate-y-1"
-                  style={{
-                    borderColor: isMusicPlaying ? "rgba(255,255,255,0.2)" : "rgba(0,0,0,0.08)",
-                    background: isMusicPlaying
-                      ? `linear-gradient(180deg, ${currentTrack.accentColor} 0%, color-mix(in srgb, ${currentTrack.accentColor} 86%, #111827 14%) 100%)`
-                      : "linear-gradient(160deg, rgba(246,246,245,0.98), rgba(236,236,234,0.96))",
-                    transition: "background 0.45s ease, border-color 0.45s ease, transform 0.5s ease, box-shadow 0.5s ease",
-                  }}
+              {/* ── TOP LAYER: Gallery + Gaming (Two Equal Squares) ── */}
+              {/* Gallery Card (Square) */}
+              <div className="group relative aspect-square w-full">
+                <Link
+                  to="/photography"
+                  aria-label="Open photography gallery"
+                  className="photography-card relative flex h-full w-full overflow-hidden rounded-[24px] border border-black/[0.08] shadow-[0_18px_48px_-24px_rgba(15,23,42,0.26)] transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_26px_56px_-22px_rgba(15,23,42,0.34)] dark:border-white/[0.09] dark:shadow-[0_18px_48px_-24px_rgba(0,0,0,0.55)]"
+                  onMouseEnter={pausePhotographyCarousel}
+                  onMouseLeave={() => resumePhotographyCarousel()}
+                  onTouchStart={pausePhotographyCarousel}
+                  onTouchEnd={() => resumePhotographyCarousel(2200)}
                 >
-                  <audio ref={audioRef} preload="auto" />
+                  <div className="pointer-events-none absolute inset-[1px] z-10 rounded-[23px] border border-white/20 dark:border-white/[0.07]" />
 
-                  <div
-                    className="pointer-events-none absolute inset-0 rounded-[24px] transition-opacity duration-500"
-                    style={{
-                      background: isMusicPlaying
-                        ? "linear-gradient(180deg, rgba(255,255,255,0.12), rgba(255,255,255,0.02))"
-                        : "radial-gradient(circle at top left, rgba(255,255,255,0.74), transparent 54%)",
-                      opacity: 1,
-                    }}
-                  />
-
-                  <div
-                    className="pointer-events-none absolute inset-0 transition-opacity duration-500"
-                    style={{
-                      background: isMusicPlaying
-                        ? "radial-gradient(circle at 22% 18%, rgba(255,255,255,0.3), transparent 32%), radial-gradient(circle at 78% 100%, rgba(17,24,39,0.22), transparent 45%)"
-                        : "radial-gradient(circle at 84% 16%, rgba(255,255,255,0.55), transparent 28%)",
-                      opacity: isMusicPlaying ? 1 : 0.9,
-                    }}
-                  />
-
-                  <div
-                    className="pointer-events-none absolute inset-0 transition-opacity duration-500"
-                    style={{
-                      boxShadow: isMusicPlaying
-                        ? "inset 0 1px 0 rgba(255,255,255,0.1)"
-                        : "inset 0 1px 0 rgba(255,255,255,0.8)",
-                      opacity: 1,
-                    }}
-                  />
-
-                  <div
-                    className="pointer-events-none absolute inset-[1px] rounded-[23px] border transition-colors duration-500"
-                    style={{ borderColor: isMusicPlaying ? "rgba(255,255,255,0.18)" : "rgba(255,255,255,0.72)" }}
-                  />
-
-                  <div className="relative z-10 flex h-full flex-col justify-between overflow-hidden px-4 pb-6 pt-4 sm:px-5 sm:pb-6 sm:pt-5 max-[768px]:px-3 max-[768px]:pb-4 max-[768px]:pt-3">
-                    <div className="flex min-h-[104px] shrink-0 items-start justify-between max-[768px]:min-h-[88px]">
-                      <div className="flex flex-col">
-                          <div
-                            className="h-[86px] w-[86px] shrink-0 overflow-hidden rounded-[18px] border transition-all duration-500 max-[768px]:h-[68px] max-[768px]:w-[68px] max-[768px]:rounded-[16px]"
-                            style={{
-                              borderColor: isMusicPlaying ? "rgba(255,255,255,0.28)" : "rgba(0,0,0,0.1)",
-                              boxShadow: isMusicPlaying
-                                ? "0 18px 36px -18px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.1)"
-                                : "0 14px 32px -18px rgba(15,23,42,0.34), inset 0 1px 0 rgba(255,255,255,0.75)",
-                            }}
-                          >
-                            <img
-                              key={currentTrack.id}
-                              src={currentTrack.albumArtUrl}
-                              alt={`${currentTrack.title} album artwork`}
-                              className="h-full w-full object-cover transition-transform duration-500"
-                              style={{ transform: isMusicPlaying ? "scale(1.08)" : "scale(1)" }}
-                            />
-                          </div>
-                      </div>
-
+                  {photographyCardImages.map((image, index) => (
+                    <div
+                      key={image.src}
+                      className="absolute inset-0 transition-opacity duration-[1100ms] ease-in-out"
+                      style={{ opacity: index === activePhotographyIndex % photographyCardImages.length ? 1 : 0 }}
+                    >
                       <img
-                        src="/images/Apple-music.svg"
-                        alt=""
-                        aria-hidden="true"
-                        className="h-9 w-9 shrink-0 object-contain opacity-90 transition-opacity duration-500 max-[768px]:h-7 max-[768px]:w-7"
+                        src={image.src}
+                        alt={image.alt}
+                        loading="eager"
+                        decoding="async"
+                        className="h-full w-full object-cover"
                       />
                     </div>
+                  ))}
 
-                    <div className="flex min-h-[80px] shrink-0 flex-col justify-start pt-2 max-[768px]:min-h-[64px] max-[768px]:pt-1.5">
-                      <div className="mb-4 w-full space-y-1.5 max-[768px]:mb-3 max-[768px]:space-y-1">
-                        <p
-                          className="text-[1.04rem] font-semibold leading-[1.15] tracking-[-0.02em] transition-colors duration-500 max-[768px]:text-[0.9rem]"
-                          style={{ color: isMusicPlaying ? "#ffffff" : "#141414" }}
-                        >
-                          {currentTrack.title}
-                        </p>
-                        <p
-                          className="text-[0.74rem] leading-snug transition-colors duration-500 max-[768px]:text-[0.64rem]"
-                          style={{ color: isMusicPlaying ? "rgba(255,255,255,0.74)" : "rgba(20,20,20,0.5)" }}
-                        >
-                          {currentTrack.artist}
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="min-h-[60px] shrink-0 overflow-hidden pt-2 max-[768px]:min-h-[52px] max-[768px]:pt-1">
-                      <div
-                        className="relative mx-auto flex h-[48px] w-[86%] items-center justify-center gap-2 rounded-full border px-3 py-1 transition-all duration-500 max-[768px]:h-[40px] max-[768px]:w-[90%] max-[768px]:gap-1 max-[768px]:px-2"
-                        style={{
-                          borderColor: isMusicPlaying ? "rgba(255,255,255,0.14)" : "rgba(0,0,0,0.08)",
-                          backgroundColor: isMusicPlaying ? "rgba(111, 25, 25, 0.28)" : "rgba(221,221,218,0.82)",
-                          boxShadow: isMusicPlaying
-                            ? "inset 0 2px 10px rgba(0,0,0,0.22), inset 0 1px 0 rgba(255,255,255,0.06)"
-                            : "inset 0 2px 10px rgba(15,23,42,0.08), inset 0 1px 0 rgba(255,255,255,0.62)",
-                        }}
-                      >
-                        <div
-                          className="pointer-events-none absolute inset-[1px] rounded-full"
-                          style={{
-                            boxShadow: isMusicPlaying
-                              ? "inset 0 1px 0 rgba(255,255,255,0.08)"
-                              : "inset 0 1px 0 rgba(255,255,255,0.5)",
-                          }}
-                        />
-                        <button
-                          type="button"
-                          className="relative z-10 flex h-8 w-8 items-center justify-center rounded-full transition-all duration-300 hover:scale-105 active:scale-95 max-[768px]:h-[26px] max-[768px]:w-[26px]"
-                          style={{ color: isMusicPlaying ? "rgba(255,255,255,0.7)" : "rgba(20,20,20,0.52)" }}
-                          aria-label="Shuffle"
-                        >
-                          <Shuffle size={15} className="max-[768px]:h-[14px] max-[768px]:w-[14px]" />
-                        </button>
-
-                        <button
-                          type="button"
-                          onClick={playPreviousTrack}
-                          className="relative z-10 flex h-8 w-8 items-center justify-center rounded-full transition-all duration-300 hover:scale-105 active:scale-95 max-[768px]:h-[26px] max-[768px]:w-[26px]"
-                          style={{ color: isMusicPlaying ? "rgba(255,255,255,0.84)" : "rgba(20,20,20,0.62)" }}
-                          aria-label="Previous track"
-                        >
-                          <SkipBack size={15} fill="currentColor" className="max-[768px]:h-[14px] max-[768px]:w-[14px]" />
-                        </button>
-
-                        <button
-                          type="button"
-                          onClick={toggleMusicPlayback}
-                          aria-pressed={isMusicPlaying}
-                          aria-label={isMusicPlaying ? "Pause" : "Play"}
-                          className="relative z-10 flex h-8 w-8 items-center justify-center rounded-full transition-all duration-300 hover:scale-105 active:scale-95 max-[768px]:h-[26px] max-[768px]:w-[26px]"
-                          style={{ color: isMusicPlaying ? "#ffffff" : "#141414" }}
-                        >
-                          {isMusicPlaying ? (
-                            <Pause size={15} fill="currentColor" className="max-[768px]:h-[14px] max-[768px]:w-[14px]" />
-                          ) : (
-                            <Play size={15} fill="currentColor" className="ml-0.5 max-[768px]:h-[14px] max-[768px]:w-[14px]" />
-                          )}
-                        </button>
-
-                        <button
-                          type="button"
-                          onClick={playNextTrack}
-                          className="relative z-10 flex h-8 w-8 items-center justify-center rounded-full transition-all duration-300 hover:scale-105 active:scale-95 max-[768px]:h-[26px] max-[768px]:w-[26px]"
-                          style={{ color: isMusicPlaying ? "rgba(255,255,255,0.84)" : "rgba(20,20,20,0.62)" }}
-                          aria-label="Next track"
-                        >
-                          <SkipForward size={15} fill="currentColor" className="max-[768px]:h-[14px] max-[768px]:w-[14px]" />
-                        </button>
-
-                        <button
-                          type="button"
-                          className="relative z-10 flex h-8 w-8 items-center justify-center rounded-full transition-all duration-300 hover:scale-105 active:scale-95 max-[768px]:h-[26px] max-[768px]:w-[26px]"
-                          style={{ color: isMusicPlaying ? "rgba(255,255,255,0.78)" : "rgba(20,20,20,0.54)" }}
-                          aria-label="Volume"
-                        >
-                          <Volume2 size={15} className="max-[768px]:h-[14px] max-[768px]:w-[14px]" />
-                        </button>
-                      </div>
-                    </div>
+                  <div className="pointer-events-none absolute inset-0 z-10 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
+                  <div className="absolute bottom-4 left-4 z-20">
+                    <p className="text-[0.62rem] font-bold uppercase tracking-[0.16em] text-white/55"></p>
+                    <p className="mt-0.5 text-sm font-semibold text-white/90"></p>
                   </div>
+                  <img
+                    src="/images/apple-photos.svg"
+                    alt=""
+                    aria-hidden
+                    className="absolute right-4 top-4 z-20 h-9 w-9 object-contain opacity-90"
+                    loading="eager"
+                    decoding="async"
+                  />
+                </Link>
+              </div>
+
+              {/* Gaming Card (Square) */}
+              <div className="group relative aspect-square w-full overflow-hidden rounded-[24px] border border-white/[0.08] bg-zinc-900 shadow-[0_18px_48px_-24px_rgba(0,0,0,0.55)] transition-[transform,box-shadow] duration-500 hover:-translate-y-1 hover:shadow-[0_26px_56px_-22px_rgba(0,0,0,0.62)]">
+                <img
+                  src="/images/GIF/Sony Playstation GIF.gif"
+                  alt=""
+                  aria-hidden
+                  className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.06]"
+                />
+                <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgba(0,0,0,0.12)_0%,rgba(0,0,0,0.26)_52%,rgba(0,0,0,0.62)_100%)]" />
+                <div className="pointer-events-none absolute inset-[1px] rounded-[23px] border border-white/[0.09]" />
+
+                <div className="absolute left-4 top-4 flex items-center gap-2">
+                  <div className="flex h-7 w-7 items-center justify-center rounded-xl border border-white/20 bg-white/10 backdrop-blur-md">
+                    <Gamepad size={14} className="text-white/90" />
+                  </div>
+                  <span className="text-[0.6rem] font-bold uppercase tracking-[0.16em] text-white/62">Gaming</span>
                 </div>
+
+                <Link
+                  to="/gaming"
+                  className="absolute bottom-4 left-4 inline-flex items-center gap-1.5 rounded-full border border-white/24 bg-white/12 px-3.5 py-1.5 text-[0.68rem] font-semibold text-white/86 shadow-[0_14px_30px_-18px_rgba(0,0,0,0.65)] backdrop-blur-xl transition-all duration-300 hover:bg-white/22 hover:text-white"
+                >
+                  View profiles <ExternalLink size={10} />
+                </Link>
               </div>
 
               {/* ── MIDDLE LAYER: Media Card ── */}
-              <div className="group relative flex-1 min-h-[120px] overflow-hidden rounded-[20px] border border-white/[0.08] shadow-[0_18px_48px_-24px_rgba(0,0,0,0.55)] transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_28px_60px_-22px_rgba(0,0,0,0.72)]">
+              <div className="group relative col-span-2 min-h-[144px] w-full justify-self-stretch overflow-hidden rounded-[20px] border border-white/[0.08] p-3 shadow-[0_18px_48px_-24px_rgba(0,0,0,0.55)] transition-[transform,box-shadow] duration-500 hover:-translate-y-1 hover:shadow-[0_28px_60px_-22px_rgba(0,0,0,0.72)]">
                 {/* Full-bleed background image */}
                 <img
                   src="/images/Media-Card.jpg"
@@ -494,37 +467,136 @@ const AboutSection = () => {
                 </div>
               </div>
 
-              {/* ── BOTTOM LAYER: Gaming Card ── */}
-              <div className="group relative flex-1 min-h-[120px] overflow-hidden rounded-[20px] border border-white/[0.08] shadow-[0_18px_48px_-24px_rgba(0,0,0,0.55)] transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_28px_60px_-22px_rgba(0,0,0,0.72)]">
-                {/* Full-bleed background image */}
-                <img
-                  src="/images/WD.jpg"
-                  alt=""
-                  aria-hidden
-                  className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.04] group-hover:brightness-110"
-                />
-                {/* Gradient overlay */}
-                <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgba(0,0,0,0.58)_0%,rgba(0,0,0,0.12)_45%,rgba(0,0,0,0.68)_100%)]" />
-                {/* Inner border */}
-                <div className="pointer-events-none absolute inset-[1px] rounded-[19px] border border-white/[0.07]" />
+              {/* ── BOTTOM LAYER: Music Card ── */}
+              <div className="relative col-span-2 h-[240px] min-h-0 max-h-[260px] w-full justify-self-stretch overflow-hidden rounded-[20px] border border-white/[0.12] bg-black/55 p-3 shadow-[0_18px_48px_-24px_rgba(0,0,0,0.62)] backdrop-blur-xl transition-[transform,box-shadow] duration-500 hover:-translate-y-1 hover:shadow-[0_28px_60px_-22px_rgba(0,0,0,0.74)]">
+                <audio ref={audioRef} preload="auto" />
+                <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(135deg,rgba(255,255,255,0.12),rgba(255,255,255,0.02)_42%,rgba(0,0,0,0.18))]" />
+                <div className="pointer-events-none absolute inset-[1px] rounded-[19px] border border-white/[0.08]" />
 
-                {/* Top-left label */}
-                <div className="absolute left-4 top-4 flex items-center gap-2">
-                  <div className="flex h-6 w-6 items-center justify-center rounded-lg border border-white/20 bg-white/10 backdrop-blur-sm">
-                    <Gamepad size={12} className="text-white/90" />
+                <div className="relative z-10 grid h-full min-h-0 grid-cols-[120px_minmax(0,1fr)] items-start gap-3">
+                  <div className="h-[120px] w-[120px] overflow-hidden rounded-[16px] border border-white/15 bg-white/10 shadow-[0_18px_36px_-22px_rgba(0,0,0,0.78)]">
+                    <img
+                      key={currentTrack.id}
+                      src={currentTrack.albumArtUrl}
+                      alt={`${currentTrack.title} album artwork`}
+                      className="h-full w-full object-cover transition-transform duration-500"
+                      style={{ transform: isMusicPlaying ? "scale(1.04)" : "scale(1)" }}
+                    />
                   </div>
-                  <span className="text-[0.58rem] font-bold uppercase tracking-[0.16em] text-white/60">Gaming</span>
-                </div>
 
-                {/* Bottom-left content + CTA */}
-                <div className="absolute bottom-4 left-4 flex flex-col gap-2">
-                  <p className="text-[0.88rem] font-semibold leading-tight text-white/90">Currently Playing</p>
-                  <Link
-                    to="/gaming"
-                    className="inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-[0.62rem] font-semibold text-white/80 backdrop-blur-sm transition-all duration-300 hover:bg-white/20 hover:text-white"
-                  >
-                    View profiles <ExternalLink size={9} />
-                  </Link>
+                  <div className="relative flex h-full min-w-0 flex-col items-start overflow-hidden pr-1">
+                    <img
+                      src="/images/Apple-music.svg"
+                      alt=""
+                      aria-hidden="true"
+                      className="absolute right-0 top-0 h-9 w-9 object-contain opacity-90"
+                    />
+
+                    <div className="mr-9 min-h-0 max-h-[132px] w-[calc(100%-2.25rem)] flex-1 overflow-y-auto overscroll-contain pr-1.5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-white/24 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar]:w-1">
+                      {playlist.map((track, trackIndex) => {
+                        const isActiveTrack = trackIndex === currentTrackIndex;
+
+                        return (
+                          <button
+                            key={track.id}
+                            type="button"
+                            onClick={() => selectTrack(trackIndex)}
+                            className={`flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-left transition-colors duration-200 ${
+                              isActiveTrack ? "bg-white/14 text-white" : "text-white/62 hover:bg-white/8 hover:text-white/86"
+                            }`}
+                          >
+                            <span className="w-4 shrink-0 text-[0.64rem] font-semibold tabular-nums text-white/38">
+                              {String(trackIndex + 1).padStart(2, "0")}
+                            </span>
+                            <span className="min-w-0 flex-1">
+                              <span className="block truncate text-[0.76rem] font-semibold leading-tight text-white">
+                                {track.title}
+                              </span>
+                              <span className="block truncate text-[0.64rem] leading-tight text-white/46">
+                                {track.artist}
+                              </span>
+                            </span>
+                          </button>
+                        );
+                      })}
+                    </div>
+
+                    <div className="mt-auto flex items-center justify-start gap-3 pt-2">
+                      {/* Player controls - shifted to left */}
+                      <div className="flex shrink-0 items-center gap-1.5 rounded-full border border-white/12 bg-white/8 px-2 py-1 backdrop-blur-md">
+                        <button
+                          type="button"
+                          onClick={playPreviousTrack}
+                          className="flex h-7 w-7 items-center justify-center rounded-full text-white/70 transition-colors duration-200 hover:bg-white/10 hover:text-white"
+                          aria-label="Previous track"
+                        >
+                          <SkipBack size={13} fill="currentColor" />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={toggleMusicPlayback}
+                          aria-pressed={isMusicPlaying}
+                          aria-label={isMusicPlaying ? "Pause" : "Play"}
+                          className="flex h-8 w-8 items-center justify-center rounded-full bg-white text-black transition-transform duration-200 hover:scale-105 active:scale-95"
+                        >
+                          {isMusicPlaying ? (
+                            <Pause size={14} fill="currentColor" />
+                          ) : (
+                            <Play size={14} fill="currentColor" className="ml-0.5" />
+                          )}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={playNextTrack}
+                          className="flex h-7 w-7 items-center justify-center rounded-full text-white/70 transition-colors duration-200 hover:bg-white/10 hover:text-white"
+                          aria-label="Next track"
+                        >
+                          <SkipForward size={13} fill="currentColor" />
+                        </button>
+                      </div>
+
+                      {/* Volume control */}
+                      <div 
+                        className="relative -my-2 -mr-[8.75rem] flex items-center py-2 pr-[8.75rem]"
+                        onMouseEnter={() => setShowVolumeSlider(true)}
+                        onMouseLeave={() => setShowVolumeSlider(false)}
+                      >
+                        <button
+                          type="button"
+                          onClick={toggleMute}
+                          className="flex h-7 w-7 items-center justify-center rounded-full border border-white/12 bg-white/8 text-white/70 backdrop-blur-md transition-colors duration-200 hover:bg-white/14 hover:text-white"
+                          aria-label={isMuted ? "Unmute" : "Mute"}
+                        >
+                          {isMuted || volume === 0 ? (
+                            <VolumeX size={14} />
+                          ) : (
+                            <Volume2 size={14} />
+                          )}
+                        </button>
+                        
+                        {/* Volume slider - appears on hover */}
+                        <div 
+                          className={`absolute left-9 z-10 flex items-center gap-2 rounded-full border border-white/12 bg-black/80 px-3 py-1.5 backdrop-blur-xl transition-all duration-200 ${
+                            showVolumeSlider ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-2 pointer-events-none"
+                          }`}
+                        >
+                          <input
+                            type="range"
+                            min="0"
+                            max="1"
+                            step="0.01"
+                            value={isMuted ? 0 : volume}
+                            onChange={(e) => handleVolumeChange(parseFloat(e.target.value))}
+                            className="h-1 w-20 cursor-pointer appearance-none rounded-full bg-white/20 accent-white [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:shadow-[0_0_4px_rgba(0,0,0,0.3)]"
+                            aria-label="Volume"
+                          />
+                          <span className="min-w-[2rem] text-[0.65rem] font-medium tabular-nums text-white/60">
+                            {Math.round((isMuted ? 0 : volume) * 100)}%
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
 

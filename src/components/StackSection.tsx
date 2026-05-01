@@ -1,6 +1,6 @@
-
 import { useEffect, useRef } from "react";
 import Container from "./ui-components/Container";
+import { DoodleCheckmark, DoodleComputer } from "./Doodles";
 
 interface TechItem {
   name: string;
@@ -102,12 +102,17 @@ const StackSection = () => {
   }, []);
 
   return (
-    <section id="stack" className="py-20">
+    <section id="stack" className="py-20 relative">
+      {/* Right margin doodle */}
+      <DoodleComputer className="absolute right-5 top-20 h-11 w-14 rotate-3 hidden 2xl:block" />
+      
       <Container size="large">
-        <div ref={titleRef} className="section-enter mb-10">
+        <div ref={titleRef} className="section-enter mb-10 relative">
           <p className="mb-2 text-sm text-charcoal/60 dark:text-offwhite/55">tools & technologies</p>
-          <h2 className="text-5xl font-bold tracking-tight text-charcoal dark:text-offwhite md:text-6xl">
+          <h2 className="text-5xl font-bold tracking-tight text-charcoal dark:text-offwhite md:text-6xl inline-flex items-center gap-3">
             Stack I Use
+            {/* Checkmark doodle */}
+            <DoodleCheckmark className="h-8 w-8 doodle-wiggle hidden sm:block" />
           </h2>
         </div>
 

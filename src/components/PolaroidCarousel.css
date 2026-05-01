@@ -43,37 +43,70 @@
 .polaroid {
   position: relative;
   width: 480px;
-  background-color: #f7f3ec;
-  padding: 18px 18px 0 18px;
-  border-radius: 4px;
-  border: 1px solid rgba(160, 140, 110, 0.16);
+  background: linear-gradient(
+    145deg,
+    rgba(255, 255, 255, 0.85) 0%,
+    rgba(255, 255, 255, 0.72) 100%
+  );
+  padding: 12px;
+  border-radius: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.5);
   box-shadow:
-    0 1px 2px rgba(0, 0, 0, 0.04),
-    0 3px 8px rgba(0, 0, 0, 0.07),
-    0 8px 24px rgba(0, 0, 0, 0.09),
-    0 20px 48px rgba(0, 0, 0, 0.09),
-    0 36px 72px rgba(0, 0, 0, 0.06),
-    inset 0 1px 0 rgba(255, 255, 255, 0.90),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.03);
+    0 2px 4px rgba(0, 0, 0, 0.02),
+    0 4px 12px rgba(0, 0, 0, 0.04),
+    0 12px 32px rgba(0, 0, 0, 0.08),
+    0 24px 64px rgba(0, 0, 0, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.02);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   display: flex;
   flex-direction: column;
   animation: polaroid-float 6s ease-in-out infinite;
   transform: rotate(var(--rotation, 0deg));
 }
 
+/* Dark mode adjustments */
+:root.dark .polaroid,
+.dark .polaroid {
+  background: linear-gradient(
+    145deg,
+    rgba(45, 42, 48, 0.82) 0%,
+    rgba(35, 32, 38, 0.75) 100%
+  );
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow:
+    0 2px 4px rgba(0, 0, 0, 0.08),
+    0 4px 12px rgba(0, 0, 0, 0.12),
+    0 12px 32px rgba(0, 0, 0, 0.18),
+    0 24px 64px rgba(0, 0, 0, 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.1);
+}
+
 /* Lift + pause float on hover */
 .polaroid:hover {
   animation-play-state: paused;
-  transform: rotate(var(--rotation, 0deg)) translateY(-7px) scale(1.016);
+  transform: rotate(var(--rotation, 0deg)) translateY(-8px) scale(1.02);
   box-shadow:
-    0 2px 4px rgba(0, 0, 0, 0.06),
-    0 8px 20px rgba(0, 0, 0, 0.11),
-    0 20px 52px rgba(0, 0, 0, 0.13),
-    0 40px 80px rgba(0, 0, 0, 0.09),
-    inset 0 1px 0 rgba(255, 255, 255, 0.92);
+    0 4px 8px rgba(0, 0, 0, 0.04),
+    0 8px 24px rgba(0, 0, 0, 0.08),
+    0 20px 48px rgba(0, 0, 0, 0.12),
+    0 32px 80px rgba(0, 0, 0, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.95);
   transition:
     transform 0.45s cubic-bezier(0.34, 1.5, 0.64, 1),
     box-shadow 0.40s ease;
+}
+
+:root.dark .polaroid:hover,
+.dark .polaroid:hover {
+  box-shadow:
+    0 4px 8px rgba(0, 0, 0, 0.12),
+    0 8px 24px rgba(0, 0, 0, 0.18),
+    0 20px 48px rgba(0, 0, 0, 0.24),
+    0 32px 80px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
 /* Floating keyframe — does NOT conflict with rotate() because
@@ -83,20 +116,28 @@
   50%        { transform: rotate(var(--rotation, 0deg)) translateY(-10px); }
 }
 
-/* Warm gloss sheen on the card surface */
+/* Subtle gloss sheen on the card surface */
 .polaroid::before {
   content: '';
   position: absolute;
   inset: 0;
-  border-radius: 3px;
+  border-radius: 23px;
   background: linear-gradient(
-    148deg,
-    rgba(255, 255, 255, 0.28) 0%,
-    transparent 48%,
-    rgba(0, 0, 0, 0.012) 100%
+    145deg,
+    rgba(255, 255, 255, 0.4) 0%,
+    transparent 40%
   );
   pointer-events: none;
   z-index: 2;
+}
+
+:root.dark .polaroid::before,
+.dark .polaroid::before {
+  background: linear-gradient(
+    145deg,
+    rgba(255, 255, 255, 0.08) 0%,
+    transparent 40%
+  );
 }
 
 /* ── Image area with fixed 3:2 aspect ratio ── */
@@ -105,7 +146,7 @@
   width: 100%;
   aspect-ratio: 3 / 2;
   overflow: hidden;
-  border-radius: 2px;
+  border-radius: 16px;
   flex-shrink: 0;
 }
 
@@ -114,80 +155,101 @@
   height: 100%;
   object-fit: cover;
   display: block;
-  filter: contrast(1.04) saturate(0.90) brightness(1.01);
+  filter: contrast(1.02) saturate(1.02) brightness(1.01);
   transition: transform 0.70s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Vignette over image */
+/* Subtle vignette over image */
 .polaroid-image-wrapper::before {
   content: '';
   position: absolute;
   inset: 0;
   background: radial-gradient(
     ellipse at center,
-    transparent 52%,
-    rgba(0, 0, 0, 0.16) 100%
+    transparent 60%,
+    rgba(0, 0, 0, 0.08) 100%
   );
   pointer-events: none;
   z-index: 1;
-  border-radius: 2px;
+  border-radius: 16px;
 }
 
-/* Film grain over image */
+/* Very subtle grain texture */
 .polaroid-image-wrapper::after {
   content: '';
   position: absolute;
   inset: 0;
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.72' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-  opacity: 0.048;
+  opacity: 0.025;
   pointer-events: none;
   z-index: 2;
   mix-blend-mode: multiply;
-  border-radius: 2px;
+  border-radius: 16px;
 }
 
 /* ── Responsive sizing ── */
 @media (max-width: 1023px) {
   .polaroid {
     width: 340px;
-    padding: 14px 14px 0 14px;
+    padding: 10px;
+    border-radius: 20px;
+  }
+  .polaroid-image-wrapper {
+    border-radius: 14px;
+  }
+  .polaroid-image-wrapper::before,
+  .polaroid-image-wrapper::after {
+    border-radius: 14px;
   }
   .polaroid-caption {
-    height: 60px;
-    font-size: 13.5px;
-    padding: 0 14px;
+    height: 52px;
+    font-size: 13px;
+    padding: 0 8px;
   }
 }
 
 @media (max-width: 639px) {
   .polaroid {
     width: 270px;
-    padding: 11px 11px 0 11px;
+    padding: 8px;
+    border-radius: 18px;
+  }
+  .polaroid-image-wrapper {
+    border-radius: 12px;
+  }
+  .polaroid-image-wrapper::before,
+  .polaroid-image-wrapper::after {
+    border-radius: 12px;
   }
   .polaroid-caption {
-    height: 52px;
-    font-size: 12px;
-    padding: 0 11px;
+    height: 44px;
+    font-size: 11.5px;
+    padding: 0 6px;
   }
 }
 
-/* ── Caption in the bottom white strip ── */
+/* ── Caption below the image ── */
 .polaroid-caption {
   flex-shrink: 0;
-  height: 70px;
+  height: 56px;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 0 18px;
-  font-family: 'DM Serif Display', Georgia, serif;
-  font-style: italic;
-  font-weight: 400;
-  font-size: 15px;
-  color: rgba(50, 40, 26, 0.50);
-  letter-spacing: 0.028em;
+  padding: 0 12px;
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', sans-serif;
+  font-style: normal;
+  font-weight: 500;
+  font-size: 13.5px;
+  color: rgba(60, 60, 67, 0.6);
+  letter-spacing: -0.01em;
   text-align: center;
-  line-height: 1.45;
+  line-height: 1.35;
   background: none;
   position: relative;
   z-index: 3;
+}
+
+:root.dark .polaroid-caption,
+.dark .polaroid-caption {
+  color: rgba(255, 255, 255, 0.55);
 }

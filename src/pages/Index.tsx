@@ -42,9 +42,9 @@ const Index = () => {
   }, []);
 
   return (
-    <div className="min-h-screen flex flex-col dark:bg-charcoal-dark dark:text-offwhite">
+    <div className="min-h-screen flex flex-col text-[var(--text-primary)]">
       <Navbar />
-      <main className="dark:text-offwhite">
+      <main>
         <HeroSection />
         <ProjectsSection />
         <StackSection />

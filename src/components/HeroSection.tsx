@@ -1,8 +1,8 @@
-
 import { useEffect, useRef, useState } from "react";
 import Container from "./ui-components/Container";
 import { ArrowRight } from "lucide-react";
 import "./PolaroidCarousel.css";
+import { DoodleArrowCurved, DoodleStarSmall, DoodleSparkle, DoodleWhirlwind, DoodleComputer } from "./Doodles";
 
 const polaroidImages = [
   {
@@ -89,9 +89,54 @@ const HeroSection = () => {
   }, []);
 
   return (
-    <section id="hero" className="min-h-screen flex items-center justify-center pt-20">
+    <section id="hero" className="relative min-h-screen flex items-center justify-center overflow-hidden pt-20">
+      {/* Left margin doodles */}
+      <DoodleComputer className="absolute left-4 top-1/3 h-12 w-14 hidden 2xl:block" />
+      <DoodleWhirlwind className="absolute left-6 bottom-1/4 h-10 w-10 hidden 2xl:block" />
+      
+      {/* Right margin doodles */}
+      <DoodleWhirlwind className="absolute right-6 top-1/4 h-12 w-12 -rotate-12 hidden 2xl:block" />
+      
+      <div className="hero-id-lanyard pointer-events-auto absolute left-0 top-0 z-0 hidden md:block lg:left-[max(0rem,calc((100vw-1400px)/2-7rem))] xl:left-[max(0.25rem,calc((100vw-1400px)/2-6rem))]">
+        <div className="hero-id-strap mx-auto h-40 w-6">
+          <div className="relative z-10 flex h-full items-center justify-center">
+            <span className="[writing-mode:vertical-rl] rotate-180 text-[0.36rem] font-semibold uppercase tracking-[0.38em] text-white/28">
+              ISHMEET.DESIGN
+            </span>
+          </div>
+        </div>
+
+        <div className="hero-id-card relative -mt-4 h-[374px] w-[216px] overflow-hidden rounded-[1.35rem] border border-white/[0.09] bg-[#1a1917] text-[#fdf6ec] shadow-[0_30px_64px_-38px_rgba(111,73,36,0.52)] dark:shadow-[0_28px_62px_-40px_rgba(0,0,0,0.78)]">
+          <div className="hero-id-slot absolute left-1/2 top-3 h-2 w-12 -translate-x-1/2 rounded-full" />
+          <div className="hero-id-card-header relative border-b border-white/10 px-7 pb-7 pt-14">
+            <h2 className="text-3xl font-medium leading-[1.12] tracking-tight text-white">
+              Ishmeet
+            </h2>
+            <p className="mt-3 text-[0.78rem] font-medium leading-relaxed text-white/56">
+              Into travel, frames, pixels, and playlists
+            </p>
+          </div>
+
+          <div className="relative px-7 pb-10 pt-10">
+            <div className="group/avatar relative mx-auto h-28 w-28 overflow-hidden rounded-full border border-white/40 bg-white/10">
+              <img
+                src="/images/Polaroids/PL1.jpg"
+                alt="Ishmeet avatar"
+                className="absolute inset-0 h-full w-full object-cover transition-opacity duration-300 group-hover/avatar:opacity-0"
+              />
+              <img
+                src="/images/GIF/Art Reaction GIF.gif"
+                alt=""
+                aria-hidden="true"
+                className="absolute inset-0 h-full w-full object-cover opacity-0 transition-opacity duration-300 group-hover/avatar:opacity-100"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+
       <Container size="large" className="relative z-10">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center min-h-[calc(100vh-5rem)] py-16">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center min-h-[calc(100vh-5rem)] py-20 lg:py-24">
 
           {/* ── Left content block ── */}
           <div className="flex flex-col justify-center gap-8">
@@ -111,7 +156,9 @@ const HeroSection = () => {
             </div>
 
             {/* Main heading */}
-            <div ref={headingRef} className="opacity-0">
+            <div ref={headingRef} className="opacity-0 relative">
+              {/* Doodle sparkle near heading */}
+              <DoodleSparkle className="absolute -right-2 -top-6 h-6 w-6 doodle-pulse hidden lg:block" />
               <h1 className="font-bold leading-[1.04] tracking-tight">
                 <span className="block text-5xl md:text-6xl lg:text-7xl text-charcoal dark:text-offwhite">
                   Building things
@@ -152,10 +199,9 @@ const HeroSection = () => {
                   e.preventDefault();
                   document.querySelector("#projects")?.scrollIntoView({ behavior: "smooth" });
                 }}
-                className="group relative inline-flex items-center gap-2 overflow-hidden rounded-full border border-black/10 bg-[linear-gradient(135deg,rgba(255,249,229,0.92),rgba(255,255,255,0.72))] px-6 py-3 text-charcoal shadow-[0_20px_48px_-28px_rgba(15,23,42,0.32)] backdrop-blur-xl transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_28px_58px_-24px_rgba(15,23,42,0.38)] dark:border-offwhite/12 dark:bg-[linear-gradient(135deg,rgba(245,225,80,0.96),rgba(252,240,171,0.9))] dark:text-charcoal-dark dark:shadow-[0_22px_44px_-24px_rgba(245,225,80,0.5)]"
+                className="group relative inline-flex items-center gap-2 overflow-hidden rounded-2xl border border-charcoal/20 bg-charcoal px-6 py-3.5 text-offwhite shadow-[0_16px_40px_-16px_rgba(28,25,23,0.5)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_24px_52px_-16px_rgba(28,25,23,0.6)] dark:border-offwhite/15 dark:bg-offwhite dark:text-charcoal-dark dark:shadow-[0_16px_40px_-16px_rgba(255,255,255,0.15)] dark:hover:shadow-[0_24px_52px_-16px_rgba(255,255,255,0.22)]"
               >
-                <span className="pointer-events-none absolute inset-[1px] rounded-full border border-white/50 dark:border-white/28" />
-                <span className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.68),transparent_44%)] dark:bg-[linear-gradient(120deg,rgba(255,255,255,0.28),transparent_58%)]" />
+                <span className="pointer-events-none absolute inset-[1px] rounded-[15px] border border-white/10 dark:border-charcoal/10" />
                 <span className="relative text-sm font-semibold tracking-[0.01em]">
                   See what I've built
                 </span>
@@ -168,9 +214,12 @@ const HeroSection = () => {
                   e.preventDefault();
                   document.querySelector("#contact")?.scrollIntoView({ behavior: "smooth" });
                 }}
-                className="inline-flex items-center rounded-full border border-black/10 bg-white/35 px-6 py-3 text-sm font-semibold text-charcoal/72 backdrop-blur-xl transition-all duration-300 hover:-translate-y-0.5 hover:bg-white/55 hover:text-charcoal dark:border-offwhite/12 dark:bg-white/6 dark:text-offwhite/65 dark:hover:bg-white/10 dark:hover:text-offwhite"
+                className="group relative inline-flex items-center gap-2 overflow-hidden rounded-2xl border border-charcoal/12 bg-white/60 px-6 py-3.5 text-charcoal/80 shadow-[0_12px_32px_-16px_rgba(0,0,0,0.12),inset_0_1px_0_rgba(255,255,255,0.7)] backdrop-blur-xl transition-all duration-300 hover:-translate-y-1 hover:border-charcoal/20 hover:bg-white/80 hover:text-charcoal hover:shadow-[0_20px_44px_-16px_rgba(0,0,0,0.18)] dark:border-offwhite/12 dark:bg-white/8 dark:text-offwhite/70 dark:shadow-[0_12px_32px_-16px_rgba(0,0,0,0.3),inset_0_1px_0_rgba(255,255,255,0.06)] dark:hover:border-offwhite/20 dark:hover:bg-white/14 dark:hover:text-offwhite"
               >
-                Get in touch
+                <span className="pointer-events-none absolute inset-[1px] rounded-[15px] border border-white/50 dark:border-white/5" />
+                <span className="relative text-sm font-semibold tracking-[0.01em]">
+                  Get in touch
+                </span>
               </a>
             </div>
           </div>
@@ -180,6 +229,10 @@ const HeroSection = () => {
             ref={carouselRef}
             className="opacity-0 relative h-[380px] sm:h-[460px] lg:h-[720px] flex items-center justify-center pl-0 lg:pl-6 xl:pl-10"
           >
+            {/* Curved arrow pointing to carousel */}
+            <DoodleArrowCurved className="absolute -left-16 top-1/4 h-10 w-20 -rotate-12 doodle-float hidden xl:block" />
+            {/* Small star accent */}
+            <DoodleStarSmall className="absolute right-8 top-12 h-5 w-5 doodle-wiggle hidden lg:block" />
             <div className="polaroid-carousel absolute inset-0">
               {polaroidImages.map((image, index) => (
                 <div
