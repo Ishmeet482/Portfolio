@@ -252,11 +252,11 @@ const Footer = () => {
                 COULDN'T CATCH ME THERE?
               </p>
               <p className="text-[clamp(1.55rem,2.4vw,2.55rem)] font-extrabold leading-[0.98] tracking-normal text-[#2d6a4f] dark:text-[#7dd9ad] relative inline-block">
-                Reach out to me here ✦—
+                Reach out to me here
                 {/* Curved arrow pointing to contact links */}
                 <DoodleArrowCurved className="absolute -bottom-6 right-0 h-6 w-14 rotate-[160deg] hidden lg:block" />
               </p>
-              <h2 className="text-[clamp(1.45rem,1.95vw,2.25rem)] font-extrabold leading-[1.01] tracking-normal text-[var(--text-primary)]">
+              <h2 className="text-[clamp(1.45rem,2.4vw,2.25rem)] font-extrabold leading-[1.01] tracking-normal text-[var(--text-primary)]">
                 Let's build something together.
               </h2>
               <p className="max-w-md text-sm leading-relaxed text-[color-mix(in_srgb,var(--text-primary)_62%,transparent)] md:text-[0.84rem]">

@@ -6,7 +6,8 @@
 
 @layer base {
   :root {
-    --bg-primary: #fdf6ec;
+    /*fdf6ec*/
+    --bg-primary: #fbebd5;
     --text-primary: #1c1917;
     --grid-color: hsla(30, 45%, 60%, 0.2);
     --background: 50 100% 97%;
@@ -226,7 +227,7 @@
 
   /* Hand-drawn doodle styles */
   .doodle-stroke {
-    color: rgba(60, 55, 50, 0.35);
+    color: rgba(60, 55, 50, 0.85);
     transition: color 0.3s ease, opacity 0.3s ease;
   }
 
@@ -236,7 +237,7 @@
 
   /* Darker doodle variant */
   .doodle-stroke-dark {
-    color: rgba(45, 40, 35, 0.55);
+    color: rgba(45, 40, 35, 0.85);
     transition: color 0.3s ease, opacity 0.3s ease;
   }
 

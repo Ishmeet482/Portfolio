@@ -329,7 +329,7 @@ const AboutSection = () => {
                     WHAT I DO
                   </p>
                   <p className="text-[0.95rem] leading-[1.76] text-charcoal/72 dark:text-offwhite/65">
-                    I work on backends, data pipelines, and clean interfaces — building everything from production APIs to ML systems that
+                    I work on backends, data pipelines, and clean interfaces - building everything from production APIs to ML systems that
                     <strong className="font-semibold text-charcoal dark:text-offwhite"> ships, scales, and remain maintainable</strong>{" "}
                     over time.
                   </p>
