@@ -495,25 +495,55 @@ const AboutSection = () => {
                     <div className="mr-9 min-h-0 max-h-[132px] w-[calc(100%-2.25rem)] flex-1 overflow-y-auto overscroll-contain pr-1.5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-white/24 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar]:w-1">
                       {playlist.map((track, trackIndex) => {
                         const isActiveTrack = trackIndex === currentTrackIndex;
+                        const isTrackPlaying = isActiveTrack && isMusicPlaying;
 
                         return (
                           <button
                             key={track.id}
                             type="button"
                             onClick={() => selectTrack(trackIndex)}
-                            className={`flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-left transition-colors duration-200 ${
-                              isActiveTrack ? "bg-white/14 text-white" : "text-white/62 hover:bg-white/8 hover:text-white/86"
+                            className={`group/track flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-left transition-[background-color,color,transform,box-shadow] duration-200 ease-out hover:-translate-y-px hover:scale-[1.01] ${
+                              isActiveTrack
+                                ? "bg-white/[0.18] text-white shadow-[0_8px_18px_-16px_rgba(255,255,255,0.38)]"
+                                : "text-white/62 hover:bg-white/8 hover:text-white/86"
                             }`}
+                            aria-label={`${isActiveTrack && isMusicPlaying ? "Pause" : "Play"} ${track.title} by ${track.artist}`}
                           >
-                            <span className="w-4 shrink-0 text-[0.64rem] font-semibold tabular-nums text-white/38">
-                              {String(trackIndex + 1).padStart(2, "0")}
+                            <span className="relative h-4 w-5 shrink-0 overflow-hidden">
+                              <span
+                                className={`absolute inset-0 flex items-center justify-center text-[0.64rem] font-semibold tabular-nums transition-opacity duration-200 ${
+                                  isActiveTrack ? "opacity-0" : "text-white/38 opacity-100 group-hover/track:opacity-0"
+                                }`}
+                              >
+                                {String(trackIndex + 1).padStart(2, "0")}
+                              </span>
+                              <span
+                                className={`absolute inset-0 flex items-center justify-center transition-opacity duration-200 ${
+                                  isActiveTrack ? "opacity-100" : "opacity-0 group-hover/track:opacity-100"
+                                }`}
+                                aria-hidden="true"
+                              >
+                                {isTrackPlaying ? (
+                                  <Pause size={11} fill="currentColor" className="text-white" />
+                                ) : (
+                                  <Play size={11} fill="currentColor" className="text-white/82" />
+                                )}
+                              </span>
                             </span>
-                            <span className="min-w-0 flex-1">
-                              <span className="block truncate text-[0.76rem] font-semibold leading-tight text-white">
+                            <span className="min-w-0 flex-1 truncate text-[0.74rem] leading-tight">
+                              <span
+                                className={`font-semibold transition-colors duration-200 ${
+                                  isActiveTrack ? "text-white" : "text-white/82 group-hover/track:text-white"
+                                }`}
+                              >
                                 {track.title}
                               </span>
-                              <span className="block truncate text-[0.64rem] leading-tight text-white/46">
-                                {track.artist}
+                              <span
+                                className={`ml-1 transition-colors duration-200 ${
+                                  isActiveTrack ? "text-white/68" : "text-white/42 group-hover/track:text-white/58"
+                                }`}
+                              >
+                                -{track.artist}
                               </span>
                             </span>
                           </button>
