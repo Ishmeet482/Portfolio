@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type MouseEvent, type PointerEvent } from "react";
+import { useCallback, useEffect, useRef, useState, type MouseEvent, type PointerEvent } from "react";
 import { ArrowLeft, X, ChevronLeft, ChevronRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion";
@@ -9,12 +9,14 @@ import Navbar from "@/components/Navbar";
 
 type PhotoAspect = "portrait" | "landscape";
 type MediaType = "polaroid" | "borderless" | "filmstrip" | "vintage";
+type CaptionStyle = "handwritten" | "label" | "pinnedTag" | "filmNote";
 
 type Photo = {
   src: string;
   caption: string;
   aspect: PhotoAspect;
   mediaType: MediaType;
+  captionStyle: CaptionStyle;
   handwrittenNote?: string;
   tag?: string;
 };
@@ -56,7 +58,6 @@ const imageFiles = [
   "18.jpg",
   "19.jpg",
   "20.JPG",
-  "20221023_125730.jpg",
   "21.jpg",
   "22.jpg",
   "23.jpg",
@@ -77,20 +78,57 @@ const imageFiles = [
 const landscapeIndexes = new Set([1, 2, 5, 8, 9, 18, 19, 20, 21, 23, 25, 27, 29, 31]);
 
 const mediaTypes: MediaType[] = ["polaroid", "borderless", "filmstrip", "vintage", "polaroid", "borderless", "polaroid", "vintage"];
-const handwrittenNotes = [
-  "Magic hour ✨", "Remember this", "Best day ever", "Golden light",
-  "Wanderlust", "Peaceful", "Adventure awaits", "Home",
-  "Breathtaking", "Serenity", "Lost in time", "Pure joy",
+const captionStyles: CaptionStyle[] = ["handwritten", "pinnedTag", "filmNote", "label", "handwritten", "label", "pinnedTag", "filmNote"];
+const photoCaptions = [
+  "Window light",
+  "Soft horizon",
+  "After rain",
+  "Street corner",
+  "Coast air",
+  "Passing clouds",
+  "Quiet lane",
+  "City rhythm",
+  "Morning track",
+  "Open road",
+  "Low light",
+  "Old wall",
+  "Side street",
+  "Late sun",
+  "Night window",
+  "Blue hour",
+  "Last glow",
+  "Moving line",
+  "Hill air",
+  "Station pause",
+  "Travel note",
+  "Far platform",
+  "Small shrine",
+  "Tokyo walk",
+  "Kyoto frame",
+  "Rain stop",
+  "Neon edge",
+  "Temple path",
+  "Rail light",
+  "Quiet crossing",
+  "Green wall",
+  "After dark",
+  "Found frame",
 ];
-const photoTags = ["favorite", "travel", "nature", "urban", "night", "golden hour", "memories", "explore"];
+const handwrittenNotes = [
+  "keep this light", "small pause", "warm air", "almost missed it",
+  "walked here twice", "good silence", "soft edges", "homeward",
+  "leave room", "stillness", "film mood", "found by accident",
+];
+const photoTags = ["keeper", "travel", "nature", "street", "night", "golden hour", "memory", "route"];
 
 const images: Photo[] = imageFiles.map((fileName, index) => ({
   src: `/images/Photography/${fileName}`,
-  caption: `Frame ${index + 1}`,
+  caption: photoCaptions[index] ?? `Frame ${index + 1}`,
   aspect: landscapeIndexes.has(index) ? "landscape" : "portrait",
   mediaType: mediaTypes[index % mediaTypes.length],
-  handwrittenNote: index % 4 === 0 ? handwrittenNotes[index % handwrittenNotes.length] : undefined,
-  tag: index % 5 === 0 ? photoTags[index % photoTags.length] : undefined,
+  captionStyle: captionStyles[index % captionStyles.length],
+  handwrittenNote: handwrittenNotes[index % handwrittenNotes.length],
+  tag: photoTags[index % photoTags.length],
 }));
 
 const slideVariants = {
@@ -117,7 +155,7 @@ const workbenchOffsets = [
 ] as const;
 
 const stickyNotes: StickyNote[] = [
-  { id: "s1", text: "Try moving things! ✨\nDrag, drop, and create\nyour own story.", rotation: 2, x: 50, y: -2, color: "yellow", isLarge: true },
+  { id: "s1", text: "Try moving things.\nDrag, drop, and build\nyour own story.", rotation: 2, x: 50, y: -2, color: "yellow", isLarge: true },
   { id: "s2", text: "Love how\nevery corner\ntells a different\nstory.", rotation: -3, x: 85, y: 45, color: "pink" },
   { id: "s3", text: "Collect\nbeautiful\nmoments.\nNot just\nthings.", rotation: 4, x: 88, y: 72, color: "cream" },
 ];
@@ -143,24 +181,28 @@ const stickyTextColors: Record<string, string> = {
 type CategoryId = "all" | "nature" | "Japan" | "urban" | "travel" | "night";
 
 const isValidImageIndex = (index: number) => Number.isInteger(index) && index >= 0 && index < images.length;
-const createCategoryIndexes = (indexes: number[]) => indexes.filter(isValidImageIndex);
+const imageIndexByFileName = new Map(imageFiles.map((fileName, index) => [fileName, index]));
+const createCategoryIndexes = (fileNames: readonly string[]) =>
+  fileNames
+    .map((fileName) => imageIndexByFileName.get(fileName))
+    .filter(isValidImageIndex);
 
-const rawCategoryImageIndexes: Record<CategoryId, number[]> = {
-  all: images.map((_, index) => index),
-  nature: [1, 2, 4, 19, 31, 33, 6],
-  Japan: [23, 24, 25, 26, 27, 28, 29, 30],
-  urban: [3, 7, 8, 9, 13, 15, 18],
-  travel: [1, 5, 20, 22, 32, 33],
-  night: [4, 6, 10, 11, 16, 17],
+const categoryImageFiles: Record<CategoryId, readonly string[]> = {
+  all: imageFiles,
+  nature: ["2.jpeg", "3.jpeg", "6.jpg", "31.jpg", "33.jpg", "35.jpg", "19.jpg"],
+  Japan: ["24.jpg", "25.jpg", "26.jpg", "27.jpg", "28.jpg", "29.jpg", "30.jpg"],
+  urban: ["4.jpeg", "7.jpeg", "8.jpeg", "9.jpeg", "13.jpg", "10.jpg", "14.jpg", "18.jpg", "16.jpg", "20.JPG", "32.jpg"],
+  travel: ["2.jpeg", "7.jpeg", "21.jpg", "22.jpg", "34.png", "35.jpg"],
+  night: ["6.jpg", "15.jpg", "16.jpg", "11.jpg", "17.jpg", "20.JPG", "22.jpg"],
 };
 
 const categoryImageIndexes: Record<CategoryId, number[]> = {
-  all: rawCategoryImageIndexes.all,
-  nature: createCategoryIndexes(rawCategoryImageIndexes.nature),
-  Japan: createCategoryIndexes(rawCategoryImageIndexes.Japan),
-  urban: createCategoryIndexes(rawCategoryImageIndexes.urban),
-  travel: createCategoryIndexes(rawCategoryImageIndexes.travel),
-  night: createCategoryIndexes(rawCategoryImageIndexes.night),
+  all: createCategoryIndexes(categoryImageFiles.all),
+  nature: createCategoryIndexes(categoryImageFiles.nature),
+  Japan: createCategoryIndexes(categoryImageFiles.Japan),
+  urban: createCategoryIndexes(categoryImageFiles.urban),
+  travel: createCategoryIndexes(categoryImageFiles.travel),
+  night: createCategoryIndexes(categoryImageFiles.night),
 };
 
 const categoryTabs: Array<{ id: CategoryId; label: string; count: number }> = [
@@ -206,14 +248,25 @@ const Photography = () => {
   });
   const heroEdgeY = useTransform(scrollYProgress, [0, 1], ["34%", "0%"]);
 
-  const getWrappedIndex = (index: number) => (index + images.length) % images.length;
   const isAllCategory = activeCategory === "all";
-  const visibleImageIndexes = categoryImageIndexes[activeCategory];
+  const visibleImageIndexes = categoryImageIndexes[activeCategory]?.length
+    ? categoryImageIndexes[activeCategory]
+    : categoryImageIndexes.all;
+  const selectedImageIndexes = visibleImageIndexes.length ? visibleImageIndexes : categoryImageIndexes.all;
+  const selectedPosition = selectedIndex === null ? -1 : selectedImageIndexes.indexOf(selectedIndex);
+  const getSelectedImageIndexAtOffset = useCallback((offset: number) => {
+    if (!selectedImageIndexes.length) return null;
 
-  const navigateToImage = (nextIndex: number, direction: number) => {
+    const startPosition = selectedPosition === -1 ? 0 : selectedPosition;
+    return selectedImageIndexes[(startPosition + offset + selectedImageIndexes.length) % selectedImageIndexes.length];
+  }, [selectedImageIndexes, selectedPosition]);
+
+  const navigateToImage = useCallback((nextIndex: number | null, direction: number) => {
+    if (nextIndex === null || !isValidImageIndex(nextIndex)) return;
+
     setNavigationDirection(direction);
-    setSelectedIndex(getWrappedIndex(nextIndex));
-  };
+    setSelectedIndex(nextIndex);
+  }, []);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -228,6 +281,8 @@ const Photography = () => {
     typeof window !== "undefined" && window.matchMedia("(max-width: 768px)").matches;
 
   const openImage = (index: number) => {
+    if (!isValidImageIndex(index)) return;
+
     setNavigationDirection(0);
     setSelectedIndex(index);
   };
@@ -308,12 +363,12 @@ const Photography = () => {
 
   const prevImage = () => {
     if (selectedIndex === null) return;
-    navigateToImage(selectedIndex - 1, -1);
+    navigateToImage(getSelectedImageIndexAtOffset(-1), -1);
   };
 
   const nextImage = () => {
     if (selectedIndex === null) return;
-    navigateToImage(selectedIndex + 1, 1);
+    navigateToImage(getSelectedImageIndexAtOffset(1), 1);
   };
 
   useEffect(() => {
@@ -321,12 +376,10 @@ const Photography = () => {
       if (selectedIndex === null) return;
 
       if (event.key === "ArrowLeft") {
-        setNavigationDirection(-1);
-        setSelectedIndex(getWrappedIndex(selectedIndex - 1));
+        navigateToImage(getSelectedImageIndexAtOffset(-1), -1);
       }
       if (event.key === "ArrowRight") {
-        setNavigationDirection(1);
-        setSelectedIndex(getWrappedIndex(selectedIndex + 1));
+        navigateToImage(getSelectedImageIndexAtOffset(1), 1);
       }
       if (event.key === "Escape") {
         closeModal();
@@ -335,16 +388,18 @@ const Photography = () => {
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [selectedIndex]);
+  }, [getSelectedImageIndexAtOffset, navigateToImage, selectedIndex]);
 
   useEffect(() => {
     if (selectedIndex === null) return;
 
-    [getWrappedIndex(selectedIndex - 1), getWrappedIndex(selectedIndex + 1)].forEach((index) => {
+    [getSelectedImageIndexAtOffset(-1), getSelectedImageIndexAtOffset(1)].forEach((index) => {
+      if (index === null) return;
+
       const img = new Image();
       img.src = images[index].src;
     });
-  }, [selectedIndex]);
+  }, [getSelectedImageIndexAtOffset, selectedIndex]);
 
   const handlers = useSwipeable({
     onSwipedLeft: nextImage,
@@ -355,8 +410,10 @@ const Photography = () => {
   });
 
   const currentImage = selectedIndex !== null ? images[selectedIndex] : null;
-  const previousImage = selectedIndex !== null ? images[getWrappedIndex(selectedIndex - 1)] : null;
-  const upcomingImage = selectedIndex !== null ? images[getWrappedIndex(selectedIndex + 1)] : null;
+  const previousImageIndex = selectedIndex !== null ? getSelectedImageIndexAtOffset(-1) : null;
+  const upcomingImageIndex = selectedIndex !== null ? getSelectedImageIndexAtOffset(1) : null;
+  const previousImage = previousImageIndex !== null ? images[previousImageIndex] : null;
+  const upcomingImage = upcomingImageIndex !== null ? images[upcomingImageIndex] : null;
 
   return (
     <div className="min-h-screen flex flex-col text-[var(--text-primary)]">
@@ -471,6 +528,7 @@ const Photography = () => {
           </div>
 
           <div className="photography-workbench relative z-10 w-full overflow-hidden rounded-[2.5rem] border border-white/40 bg-gradient-to-br from-[#f5f4f0] via-[#eceae6] to-[#e8e6e2] p-6 shadow-[0_40px_100px_-50px_rgba(0,0,0,0.35),inset_0_1px_0_rgba(255,255,255,0.8)] backdrop-blur-sm dark:border-white/[0.08] dark:from-[#252320] dark:via-[#1f1d1a] dark:to-[#1a1816] dark:shadow-[0_40px_100px_-50px_rgba(0,0,0,0.7),inset_0_1px_0_rgba(255,255,255,0.05)] md:p-12 lg:p-14">
+            <div className="photography-bench-light pointer-events-none absolute inset-0 z-[1]" aria-hidden="true" />
             <div className="pointer-events-none absolute inset-0 photography-pegboard opacity-60 dark:opacity-40" />
             <div className="pointer-events-none absolute inset-[1px] rounded-[calc(2.5rem-1px)] border border-white/50 dark:border-white/[0.04]" />
 
@@ -492,56 +550,21 @@ const Photography = () => {
                   className="sticky-note-realistic relative"
                   style={{ transform: `rotate(${note.rotation}deg)` }}
                 >
-                  {/* Paper texture and gradient */}
                   <div
                     className={cn(
-                      "relative rounded-[3px] bg-gradient-to-b",
+                      "photography-sticky-paper relative rounded-[3px] bg-gradient-to-br",
                       note.isLarge ? "min-w-[180px] px-6 py-5" : "min-w-[100px] px-4 py-3",
                       stickyColors[note.color] || stickyColors.yellow
                     )}
-                    style={{
-                      boxShadow: note.isLarge 
-                        ? `
-                          0 2px 2px rgba(0,0,0,0.1),
-                          0 4px 4px rgba(0,0,0,0.08),
-                          0 8px 8px rgba(0,0,0,0.06),
-                          0 16px 16px rgba(0,0,0,0.05),
-                          0 24px 24px rgba(0,0,0,0.04),
-                          3px 3px 6px rgba(0,0,0,0.12)
-                        `
-                        : `
-                          0 1px 1px rgba(0,0,0,0.08),
-                          0 2px 2px rgba(0,0,0,0.06),
-                          0 4px 4px rgba(0,0,0,0.05),
-                          0 8px 8px rgba(0,0,0,0.04),
-                          0 16px 16px rgba(0,0,0,0.03),
-                          2px 2px 3px rgba(0,0,0,0.1)
-                        `,
-                    }}
                   >
-                    {/* Subtle paper lines */}
-                    <div className="pointer-events-none absolute inset-0 opacity-[0.07]" style={{
-                      backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 18px, rgba(0,0,0,0.3) 18px, rgba(0,0,0,0.3) 19px)',
-                    }} />
-                    {/* Top edge highlight */}
-                    <div className="pointer-events-none absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-transparent via-white/40 to-transparent" />
-                    {/* Tape strip for large note */}
                     {note.isLarge && (
-                      <div className="absolute left-1/2 -top-3 -translate-x-1/2 h-6 w-16 rounded-sm bg-gradient-to-b from-amber-200/80 to-amber-300/70 shadow-[0_2px_4px_rgba(0,0,0,0.15)]" 
+                      <div className="photography-paper-tape absolute left-1/2 -top-3 -translate-x-1/2 h-6 w-16 rounded-sm" 
                         style={{ transform: 'rotate(-1deg)' }}
                       />
                     )}
-                    {/* Folded corner effect */}
-                    <div className={cn(
-                      "pointer-events-none absolute bottom-0 left-0",
-                      note.isLarge ? "h-5 w-5" : "h-4 w-4"
-                    )} style={{
-                      background: 'linear-gradient(135deg, transparent 50%, rgba(0,0,0,0.06) 50%)',
-                    }} />
-                    {/* Text */}
                     <p 
                       className={cn(
-                        "font-handwriting whitespace-pre-line",
+                        "relative z-10 font-handwriting whitespace-pre-line",
                         note.isLarge ? "text-[1.1rem] leading-[1.5]" : "text-[0.9rem] leading-[1.4]",
                         stickyTextColors[note.color] || stickyTextColors.yellow
                       )}
@@ -561,7 +584,7 @@ const Photography = () => {
                 className="pointer-events-none absolute z-30 hidden md:block"
                 style={{ left: `${tag.x}%`, top: `${tag.y}%`, transform: `rotate(${tag.rotation}deg)` }}
               >
-                <div className="rounded-full bg-charcoal/90 px-3 py-1.5 text-[0.7rem] font-medium text-offwhite/90 shadow-[0_4px_12px_-4px_rgba(0,0,0,0.4)] dark:bg-offwhite/90 dark:text-charcoal/90">
+                <div className="photography-board-tag rounded-full bg-charcoal/90 px-3 py-1.5 text-[0.7rem] font-medium text-offwhite/90 dark:bg-offwhite/90 dark:text-charcoal/90">
                   {tag.text}
                 </div>
               </div>
@@ -592,6 +615,9 @@ const Photography = () => {
                 const isFilmstrip = image.mediaType === "filmstrip";
                 const isVintage = image.mediaType === "vintage";
                 const isBorderless = image.mediaType === "borderless";
+                const showLabelCaption = image.captionStyle === "label" || (isPolaroid && image.captionStyle !== "pinnedTag");
+                const showPinnedTag = image.captionStyle === "pinnedTag" && !isFilmstrip;
+                const showFilmNote = image.captionStyle === "filmNote" || isFilmstrip;
 
                 return (
                   <button
@@ -605,13 +631,13 @@ const Photography = () => {
                       !isBorderless && "rounded-sm",
                       isBorderless && "rounded-xl",
                       // Polaroid style
-                      isPolaroid && "photography-polaroid bg-gradient-to-b from-[#fefefe] via-[#f9f9f7] to-[#f4f3f0] p-2 pb-10 shadow-[0_2px_4px_rgba(0,0,0,0.06),0_8px_16px_-4px_rgba(0,0,0,0.1),0_16px_32px_-8px_rgba(0,0,0,0.12),0_24px_48px_-12px_rgba(0,0,0,0.08)] dark:from-[#2a2a2a] dark:via-[#252525] dark:to-[#202020] dark:shadow-[0_2px_4px_rgba(0,0,0,0.2),0_8px_16px_-4px_rgba(0,0,0,0.3),0_16px_32px_-8px_rgba(0,0,0,0.35)]",
+                      isPolaroid && "photography-polaroid bg-gradient-to-b from-[#fefefe] via-[#f9f9f7] to-[#f4f3f0] p-2 pb-11 shadow-[0_2px_4px_rgba(0,0,0,0.06),0_8px_16px_-4px_rgba(0,0,0,0.1),0_16px_32px_-8px_rgba(0,0,0,0.12),0_24px_48px_-12px_rgba(0,0,0,0.08)] dark:from-[#2a2a2a] dark:via-[#252525] dark:to-[#202020] dark:shadow-[0_2px_4px_rgba(0,0,0,0.2),0_8px_16px_-4px_rgba(0,0,0,0.3),0_16px_32px_-8px_rgba(0,0,0,0.35)]",
                       // Filmstrip style
                       isFilmstrip && "photography-filmstrip bg-gradient-to-b from-[#1a1a1a] to-[#0d0d0d] p-1 shadow-[0_4px_12px_-2px_rgba(0,0,0,0.3),0_12px_24px_-6px_rgba(0,0,0,0.25)]",
                       // Vintage style
                       isVintage && "photography-vintage bg-gradient-to-br from-[#f5f0e6] via-[#ebe4d6] to-[#ddd5c4] p-3 shadow-[0_3px_8px_-2px_rgba(0,0,0,0.08),0_10px_20px_-6px_rgba(0,0,0,0.12),0_20px_40px_-12px_rgba(0,0,0,0.1)] dark:from-[#3a3630] dark:via-[#2e2a24] dark:to-[#252220]",
                       // Borderless style
-                      isBorderless && "photography-borderless overflow-hidden shadow-[0_4px_12px_-4px_rgba(0,0,0,0.15),0_12px_28px_-8px_rgba(0,0,0,0.2),0_20px_44px_-16px_rgba(0,0,0,0.15)]",
+                      isBorderless && "photography-borderless overflow-visible shadow-[0_4px_12px_-4px_rgba(0,0,0,0.15),0_12px_28px_-8px_rgba(0,0,0,0.2),0_20px_44px_-16px_rgba(0,0,0,0.15)]",
                       // Hover states (only when not dragging)
                       !isDragging && "hover:shadow-[0_8px_20px_-6px_rgba(0,0,0,0.15),0_20px_40px_-12px_rgba(0,0,0,0.2),0_32px_64px_-20px_rgba(0,0,0,0.18)]",
                       !isDragging && "dark:hover:shadow-[0_8px_20px_-6px_rgba(0,0,0,0.4),0_20px_40px_-12px_rgba(0,0,0,0.45),0_32px_64px_-20px_rgba(0,0,0,0.4)]",
@@ -641,14 +667,14 @@ const Photography = () => {
                     )}
                     {isFilmstrip && (
                       <>
-                        <div className="photography-filmstrip-holes absolute left-0 top-0 bottom-0 w-3 flex flex-col justify-around py-1">
-                          {[...Array(4)].map((_, i) => (
-                            <div key={i} className="h-2 w-2 rounded-sm bg-[#0a0a0a]" />
+                        <div className="photography-filmstrip-holes absolute left-0 top-0 bottom-0 w-4 flex flex-col justify-around py-2">
+                          {[...Array(6)].map((_, i) => (
+                            <div key={i} className="photography-filmstrip-hole h-2 w-2 rounded-[2px]" />
                           ))}
                         </div>
-                        <div className="photography-filmstrip-holes absolute right-0 top-0 bottom-0 w-3 flex flex-col justify-around py-1">
-                          {[...Array(4)].map((_, i) => (
-                            <div key={i} className="h-2 w-2 rounded-sm bg-[#0a0a0a]" />
+                        <div className="photography-filmstrip-holes absolute right-0 top-0 bottom-0 w-4 flex flex-col justify-around py-2">
+                          {[...Array(6)].map((_, i) => (
+                            <div key={i} className="photography-filmstrip-hole h-2 w-2 rounded-[2px]" />
                           ))}
                         </div>
                       </>
@@ -663,7 +689,7 @@ const Photography = () => {
                     <div className={cn(
                       "relative overflow-hidden",
                       isPolaroid && "rounded-[2px]",
-                      isFilmstrip && "mx-3 rounded-[1px]",
+                      isFilmstrip && "mx-5 rounded-[2px]",
                       isVintage && "rounded-[2px] ring-1 ring-black/5",
                       isBorderless && "rounded-xl"
                     )}>
@@ -682,23 +708,31 @@ const Photography = () => {
                         )}
                       />
                       {/* Light reflection overlay */}
-                      <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-white/10 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+                      <div className="photography-photo-gloss pointer-events-none absolute inset-0 opacity-80 transition-opacity duration-300 group-hover:opacity-100" />
                     </div>
 
-                    {/* Polaroid caption area */}
-                    {isPolaroid && image.handwrittenNote && (
+                    {showLabelCaption && (
                       <div className="absolute bottom-2 left-0 right-0 px-2 text-center">
-                        <p className="font-handwriting text-[0.75rem] text-charcoal/70 dark:text-offwhite/60 italic">
-                          {image.handwrittenNote}
+                        <p className="photography-polaroid-caption font-handwriting text-[0.82rem] text-charcoal/70 dark:text-offwhite/60">
+                          {isPolaroid ? image.handwrittenNote : image.caption}
                         </p>
                       </div>
                     )}
 
-                    {/* Tag */}
-                    {image.tag && !isFilmstrip && (
-                      <div className="absolute -right-2 -bottom-2 z-20 rotate-6">
-                        <div className="rounded-full bg-charcoal/85 px-2 py-0.5 text-[0.6rem] font-medium text-offwhite shadow-[0_2px_6px_-2px_rgba(0,0,0,0.3)] dark:bg-offwhite/85 dark:text-charcoal">
-                          #{image.tag}
+                    {showFilmNote && (
+                      <div className={cn(
+                        "photography-film-caption pointer-events-none absolute z-20",
+                        isFilmstrip ? "bottom-1 left-1/2 -translate-x-1/2" : "-bottom-3 left-3 rotate-[-3deg]"
+                      )}>
+                        <span>{isFilmstrip ? image.caption : image.handwrittenNote}</span>
+                      </div>
+                    )}
+
+                    {showPinnedTag && (
+                      <div className="photography-caption-tag pointer-events-none absolute -right-4 -bottom-3 z-40 rotate-6">
+                        <span className="photography-caption-pin" />
+                        <div className="rounded-[3px] px-2.5 py-1 text-[0.62rem] font-semibold uppercase tracking-[0.11em] text-charcoal/75 dark:text-charcoal/80">
+                          {image.tag}
                         </div>
                       </div>
                     )}
