@@ -3,6 +3,7 @@ import { Github, ExternalLink, ChevronDown } from "lucide-react";
 import { Button } from "./ui/button";
 import { Badge } from "./ui/badge";
 import { type CSSProperties, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 
 export interface ProjectProps {
   id?: string;
@@ -115,19 +116,31 @@ const ProjectCard = ({
   );
 
   const imageBlock = (
-    <div className="shrink-0 w-full md:w-[46%] flex flex-col">
-      <div className="relative overflow-hidden rounded-2xl shadow-[0_16px_40px_-24px_rgba(15,23,42,0.2)] transition-all duration-500 group-hover:shadow-[0_22px_50px_-22px_rgba(15,23,42,0.28)] dark:shadow-[0_16px_40px_-24px_rgba(0,0,0,0.48)]">
+    <motion.div
+      className="shrink-0 w-full md:w-[46%] flex flex-col"
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, amount: 0.3 }}
+      transition={{ duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
+    >
+      <motion.div
+        className="relative overflow-hidden rounded-2xl shadow-[0_16px_40px_-24px_rgba(15,23,42,0.2)] dark:shadow-[0_16px_40px_-24px_rgba(0,0,0,0.48)]"
+        whileHover={{ boxShadow: "0 22px 50px -22px rgba(15,23,42,0.28)" }}
+        transition={{ duration: 0.4 }}
+      >
         <div className="aspect-[16/10] overflow-hidden rounded-2xl">
-          <img
+          <motion.img
             src={primaryImage}
             alt={title}
-            className="block h-full w-full object-cover object-top transition-transform duration-700 group-hover:scale-[1.04]"
+            className="block h-full w-full object-cover object-top"
+            whileHover={{ scale: 1.045 }}
+            transition={{ duration: 0.6, ease: [0.25, 0.46, 0.45, 0.94] }}
           />
         </div>
         <div className="pointer-events-none absolute inset-0 rounded-2xl shadow-[inset_0_0_0_1px_rgba(0,0,0,0.07)] dark:shadow-[inset_0_0_0_1px_rgba(255,255,255,0.06)]" />
-      </div>
+      </motion.div>
       {!compact && actionButtons}
-    </div>
+    </motion.div>
   );
 
   const insightsTabsSection = (
@@ -191,8 +204,15 @@ const ProjectCard = ({
         />
       </button>
 
+      <AnimatePresence initial={false}>
       {isExpanded && (
-        <div className="px-3.5 pb-3.5">
+        <motion.div
+          className="px-3.5 pb-3.5"
+          initial={{ height: 0, opacity: 0 }}
+          animate={{ height: "auto", opacity: 1 }}
+          exit={{ height: 0, opacity: 0 }}
+          transition={{ duration: 0.35, ease: [0.25, 0.46, 0.45, 0.94] }}
+        >
           <div className="mb-3 flex gap-4 border-b border-charcoal/10 dark:border-offwhite/10">
             {!!learned?.length && (
               <button
@@ -232,8 +252,9 @@ const ProjectCard = ({
               </li>
             ))}
           </ul>
-        </div>
+        </motion.div>
       )}
+      </AnimatePresence>
     </div>
   );
 
@@ -305,13 +326,21 @@ const ProjectCard = ({
   );
 
   return (
-    <div
-      className="group relative w-full overflow-hidden rounded-[1.75rem] border border-[color:var(--project-card-border)] bg-[var(--project-card-bg)] p-8 text-[#1c1917] shadow-[0_4px_24px_rgba(0,0,0,0.07),inset_0_1px_0_rgba(255,255,255,0.5)] backdrop-blur-xl transition-all duration-300 hover:-translate-y-[6px] hover:border-[color:var(--project-card-border-hover)] hover:shadow-[0_12px_40px_rgba(0,0,0,0.12),inset_0_1px_0_rgba(255,255,255,0.5)] dark:border-[color:var(--project-card-dark-border)] dark:bg-[var(--project-card-dark-bg)] dark:text-white dark:shadow-[0_4px_24px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.06)] dark:hover:border-[color:var(--project-card-dark-border-hover)] dark:hover:shadow-[0_16px_48px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(255,255,255,0.08)] sm:p-9 lg:p-10"
+    <motion.div
+      className="group relative w-full overflow-hidden rounded-[1.75rem] border border-[color:var(--project-card-border)] bg-[var(--project-card-bg)] p-8 text-[#1c1917] shadow-[0_4px_24px_rgba(0,0,0,0.07),inset_0_1px_0_rgba(255,255,255,0.5)] backdrop-blur-xl dark:border-[color:var(--project-card-dark-border)] dark:bg-[var(--project-card-dark-bg)] dark:text-white dark:shadow-[0_4px_24px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.06)] sm:p-9 lg:p-10"
       style={{
         ...cardStyle,
-        transitionTimingFunction: "cubic-bezier(0.34, 1.56, 0.64, 1)",
         WebkitBackdropFilter: "blur(12px)",
       }}
+      initial={{ opacity: 0, y: 32 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, amount: 0.15 }}
+      whileHover={{
+        y: -6,
+        boxShadow: "0 20px 50px rgba(0,0,0,0.13), inset 0 1px 0 rgba(255,255,255,0.5)",
+        transition: { type: "spring", stiffness: 300, damping: 25 },
+      }}
+      transition={{ duration: 0.55, ease: [0.25, 0.46, 0.45, 0.94] }}
     >
       <div
         className={cn(
@@ -322,7 +351,7 @@ const ProjectCard = ({
         {imageBlock}
         {contentBlock}
       </div>
-    </div>
+    </motion.div>
   );
 };
 

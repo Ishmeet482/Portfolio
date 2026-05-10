@@ -1,6 +1,6 @@
-import { useEffect, useRef } from "react";
 import Container from "./ui-components/Container";
 import { DoodleCheckmark, DoodleComputer } from "./Doodles";
+import { motion } from "framer-motion";
 
 interface TechItem {
   name: string;
@@ -73,70 +73,108 @@ const categories: TechCategory[] = [
   },
 ];
 
+const containerVariants = {
+  hidden: {},
+  visible: {
+    transition: { staggerChildren: 0.07, delayChildren: 0.1 },
+  },
+};
+
+const cellVariants = {
+  hidden: { opacity: 0, y: 22 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.45, ease: [0.25, 0.46, 0.45, 0.94] as const },
+  },
+};
+
+const pillVariants = {
+  hidden: { opacity: 0, scale: 0.92, y: 8 },
+  visible: {
+    opacity: 1,
+    scale: 1,
+    y: 0,
+    transition: { duration: 0.35, ease: [0.25, 0.46, 0.45, 0.94] as const },
+  },
+};
+
+const pillsContainerVariants = {
+  hidden: {},
+  visible: {
+    transition: { staggerChildren: 0.04, delayChildren: 0.08 },
+  },
+};
+
 const StackSection = () => {
-  const sectionRef = useRef<HTMLDivElement>(null);
-  const titleRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const sectionElement = sectionRef.current;
-    const titleElement = titleRef.current;
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add("section-enter-active");
-            observer.unobserve(entry.target);
-          }
-        });
-      },
-      { threshold: 0.1 }
-    );
-
-    if (sectionElement) observer.observe(sectionElement);
-    if (titleElement) observer.observe(titleElement);
-
-    return () => {
-      if (sectionElement) observer.unobserve(sectionElement);
-      if (titleElement) observer.unobserve(titleElement);
-    };
-  }, []);
-
   return (
     <section id="stack" className="py-20 relative">
       {/* Right margin doodle */}
       <DoodleComputer className="absolute right-5 top-20 h-11 w-14 rotate-3 hidden 2xl:block" />
       
       <Container size="large">
-        <div ref={titleRef} className="section-enter mb-10 relative">
+        <motion.div
+          className="mb-10 relative"
+          initial={{ opacity: 0, y: 24 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.3 }}
+          transition={{ duration: 0.55, ease: [0.25, 0.46, 0.45, 0.94] }}
+        >
           <p className="mb-2 text-sm text-charcoal/60 dark:text-offwhite/55">tools & technologies</p>
           <h2 className="text-5xl font-bold tracking-tight text-charcoal dark:text-offwhite md:text-6xl inline-flex items-center gap-3">
             Stack I Use
             {/* Checkmark doodle */}
             <DoodleCheckmark className="h-8 w-8 doodle-wiggle hidden sm:block" />
           </h2>
-        </div>
+        </motion.div>
 
-        <div ref={sectionRef} className="section-enter">
+        <motion.div
+          initial={{ opacity: 0, y: 32, scale: 0.98 }}
+          whileInView={{ opacity: 1, y: 0, scale: 1 }}
+          viewport={{ once: true, amount: 0.1 }}
+          transition={{ duration: 0.6, ease: [0.25, 0.46, 0.45, 0.94] }}
+        >
           {/* Outer container — rounded frame, shadow, light overlay */}
           <div className="relative overflow-hidden rounded-[2rem] border border-black/[0.08] dark:border-offwhite/10 shadow-[0_28px_72px_-44px_rgba(15,23,42,0.16)] dark:shadow-[0_28px_72px_-44px_rgba(0,0,0,0.55)]">
             <div className="pointer-events-none absolute inset-0 z-10 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.52),transparent_44%)] dark:bg-[radial-gradient(circle_at_top_left,rgba(245,225,80,0.07),transparent_44%)]" />
 
             {/* gap-px + bg fill = 1 px divider lines between every cell */}
-            <div className="relative grid grid-cols-1 gap-px bg-black/[0.06] dark:bg-offwhite/[0.07] sm:grid-cols-2 lg:grid-cols-5">
+            <motion.div
+              className="relative grid grid-cols-1 gap-px bg-black/[0.06] dark:bg-offwhite/[0.07] sm:grid-cols-2 lg:grid-cols-5"
+              variants={containerVariants}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, amount: 0.15 }}
+            >
               {categories.map((category) => (
-                <div
+                <motion.div
                   key={category.label}
+                  variants={cellVariants}
                   className="bg-[linear-gradient(160deg,rgba(255,255,255,0.86),rgba(255,249,229,0.74))] dark:bg-[linear-gradient(160deg,rgba(42,38,47,0.92),rgba(32,29,37,0.88))] p-6 md:p-7"
                 >
                   <p className="mb-5 text-[0.58rem] font-semibold uppercase tracking-[0.30em] text-charcoal/36 dark:text-offwhite/40">
                     {category.label}
                   </p>
 
-                  <div className="flex flex-wrap gap-2">
+                  <motion.div
+                    className="flex flex-wrap gap-2"
+                    variants={pillsContainerVariants}
+                    initial="hidden"
+                    whileInView="visible"
+                    viewport={{ once: true }}
+                  >
                     {category.items.map((tech) => (
-                      <div
+                      <motion.div
                         key={tech.name}
-                        className="flex cursor-default items-center gap-1.5 rounded-xl border border-black/[0.07] dark:border-offwhite/10 bg-white/62 dark:bg-white/[0.06] px-2.5 py-[0.36rem] shadow-[0_1px_3px_rgba(0,0,0,0.04),inset_0_1px_0_rgba(255,255,255,0.72)] dark:shadow-[0_1px_3px_rgba(0,0,0,0.2),inset_0_1px_0_rgba(255,255,255,0.05)] transition-all duration-200 ease-out hover:-translate-y-px hover:scale-[1.05] hover:bg-white/85 dark:hover:bg-white/[0.1] hover:shadow-[0_5px_16px_-5px_rgba(15,23,42,0.12)] dark:hover:shadow-[0_5px_16px_-5px_rgba(0,0,0,0.4)]"
+                        variants={pillVariants}
+                        whileHover={{
+                          y: -3,
+                          scale: 1.06,
+                          boxShadow: "0 8px 20px -6px rgba(15,23,42,0.14)",
+                          transition: { type: "spring", stiffness: 400, damping: 22 },
+                        }}
+                        whileTap={{ scale: 0.97 }}
+                        className="flex cursor-default items-center gap-1.5 rounded-xl border border-black/[0.07] dark:border-offwhite/10 bg-white/62 dark:bg-white/[0.06] px-2.5 py-[0.36rem] shadow-[0_1px_3px_rgba(0,0,0,0.04),inset_0_1px_0_rgba(255,255,255,0.72)] dark:shadow-[0_1px_3px_rgba(0,0,0,0.2),inset_0_1px_0_rgba(255,255,255,0.05)]"
                       >
                         <img
                           src={tech.logo}
@@ -159,14 +197,14 @@ const StackSection = () => {
                         <span className="whitespace-nowrap text-[0.73rem] font-medium leading-none text-charcoal/72 dark:text-offwhite/75">
                           {tech.name}
                         </span>
-                      </div>
+                      </motion.div>
                     ))}
-                  </div>
-                </div>
+                  </motion.div>
+                </motion.div>
               ))}
-            </div>
+            </motion.div>
           </div>
-        </div>
+        </motion.div>
       </Container>
     </section>
   );

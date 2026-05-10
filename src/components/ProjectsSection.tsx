@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { X } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import Container from "./ui-components/Container";
 import ProjectCard, { ProjectProps } from "./ProjectCard";
 import { DoodleUnderline, DoodleArrowDown, DoodleSmiley, DoodleLightbulb } from "./Doodles";
@@ -243,7 +244,7 @@ const ProjectsSection = () => {
   return (
     <section id="projects" className="py-20 relative">
       {/* Left margin doodle */}
-      <DoodleLightbulb className="absolute left-4 top-40 h-10 w-8 hidden 2xl:block" />
+      <DoodleLightbulb className="absolute left-40 top-40 h-10 w-8 -rotate-12 hidden 2xl:block" />
       
       {/* Right margin doodle */}
       <DoodleSmiley className="absolute right-6 top-1/3 h-10 w-10 hidden 2xl:block" />
@@ -267,10 +268,20 @@ const ProjectsSection = () => {
             ))}
 
             {/* Explore More CTA */}
-            <button
+            <motion.button
               type="button"
               onClick={() => setIsOverlayOpen(true)}
-              className="group w-full overflow-hidden rounded-[1.75rem] border border-black/8 bg-[linear-gradient(145deg,rgba(255,255,255,0.78),rgba(255,249,229,0.64))] p-5 text-left shadow-[0_24px_60px_-42px_rgba(15,23,42,0.22),inset_0_1px_0_rgba(255,255,255,0.75)] backdrop-blur-[2px] transition-all duration-500 hover:-translate-y-1.5 hover:shadow-[0_34px_76px_-36px_rgba(15,23,42,0.3),inset_0_1px_0_rgba(255,255,255,0.75)] dark:border-offwhite/10 dark:bg-[linear-gradient(145deg,rgba(42,38,47,0.92),rgba(32,29,37,0.86))] dark:shadow-[0_30px_70px_-44px_rgba(0,0,0,0.62)] dark:hover:shadow-[0_38px_82px_-40px_rgba(0,0,0,0.72)]"
+              className="group w-full overflow-hidden rounded-[1.75rem] border border-black/8 bg-[linear-gradient(145deg,rgba(255,255,255,0.78),rgba(255,249,229,0.64))] p-5 text-left shadow-[0_24px_60px_-42px_rgba(15,23,42,0.22),inset_0_1px_0_rgba(255,255,255,0.75)] backdrop-blur-[2px] dark:border-offwhite/10 dark:bg-[linear-gradient(145deg,rgba(42,38,47,0.92),rgba(32,29,37,0.86))] dark:shadow-[0_30px_70px_-44px_rgba(0,0,0,0.62)]"
+              initial={{ opacity: 0, y: 24 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.2 }}
+              whileHover={{
+                y: -6,
+                boxShadow: "0 34px 76px -36px rgba(15,23,42,0.3), inset 0 1px 0 rgba(255,255,255,0.75)",
+                transition: { type: "spring", stiffness: 300, damping: 25 },
+              }}
+              whileTap={{ scale: 0.985 }}
+              transition={{ duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
             >
               <div className="flex items-center justify-between gap-6 rounded-2xl border border-black/8 bg-white/40 px-6 py-8 transition-all duration-500 group-hover:border-black/12 group-hover:bg-white/50 dark:border-offwhite/10 dark:bg-white/5 dark:group-hover:border-offwhite/15 dark:group-hover:bg-white/8">
                 <div>
@@ -284,57 +295,100 @@ const ProjectsSection = () => {
                     {projects.length - featuredProjects.length} more projects in the archive.
                   </p>
                 </div>
-                <div className="shrink-0 inline-flex h-11 w-11 items-center justify-center rounded-full border border-black/10 bg-white/60 text-charcoal shadow-[0_10px_22px_-14px_rgba(15,23,42,0.2)] transition-all duration-300 group-hover:-translate-y-0.5 group-hover:bg-white dark:border-offwhite/10 dark:bg-white/8 dark:text-offwhite dark:group-hover:bg-white/14">
+                <motion.div
+                  className="shrink-0 inline-flex h-11 w-11 items-center justify-center rounded-full border border-black/10 bg-white/60 text-charcoal shadow-[0_10px_22px_-14px_rgba(15,23,42,0.2)] dark:border-offwhite/10 dark:bg-white/8 dark:text-offwhite"
+                  whileHover={{ y: -2, backgroundColor: "rgba(255,255,255,0.9)" }}
+                  transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                >
                   <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                   </svg>
-                </div>
+                </motion.div>
               </div>
-            </button>
+            </motion.button>
           </div>
         </div>
       </Container>
 
+      <AnimatePresence>
       {isOverlayOpen && (
-        <div
+        <motion.div
           className="fixed inset-0 z-[70] bg-black/45 backdrop-blur-lg"
           onClick={() => setIsOverlayOpen(false)}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.3 }}
         >
-          <div
+          <motion.div
             className="mx-auto flex h-full max-w-6xl flex-col px-4 py-4 sm:px-8 sm:py-8 lg:px-12"
             onClick={(event) => event.stopPropagation()}
+            initial={{ opacity: 0, y: 40, scale: 0.97 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 30, scale: 0.97 }}
+            transition={{ duration: 0.4, ease: [0.25, 0.46, 0.45, 0.94] }}
           >
             <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-[2rem] border border-black/10 bg-[linear-gradient(145deg,rgba(255,249,229,0.96),rgba(255,255,255,0.9))] shadow-[0_38px_90px_-42px_rgba(15,23,42,0.38)] backdrop-blur-xl dark:border-offwhite/10 dark:bg-[linear-gradient(145deg,rgba(40,36,46,0.97),rgba(30,28,34,0.95))] dark:shadow-[0_38px_90px_-40px_rgba(0,0,0,0.72)]">
               <div className="flex items-start justify-between gap-6 border-b border-black/8 px-8 py-6 dark:border-offwhite/10 sm:px-10">
                 <div>
-                  <p className="mb-1.5 text-xs font-semibold uppercase tracking-widest text-charcoal/45 dark:text-offwhite/45">
+                  <motion.p
+                    className="mb-1.5 text-xs font-semibold uppercase tracking-widest text-charcoal/45 dark:text-offwhite/45"
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.15, duration: 0.35 }}
+                  >
                     Project Archive
-                  </p>
-                  <h3 className="text-2xl font-bold tracking-tight text-charcoal dark:text-offwhite">
+                  </motion.p>
+                  <motion.h3
+                    className="text-2xl font-bold tracking-tight text-charcoal dark:text-offwhite"
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.2, duration: 0.35 }}
+                  >
                     All Projects
-                  </h3>
+                  </motion.h3>
                 </div>
-                <button
+                <motion.button
                   type="button"
                   onClick={() => setIsOverlayOpen(false)}
-                  className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-black/10 bg-white/55 text-charcoal shadow-[0_16px_30px_-22px_rgba(15,23,42,0.22)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-white dark:border-offwhite/10 dark:bg-white/8 dark:text-offwhite dark:hover:bg-white/14"
+                  className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-black/10 bg-white/55 text-charcoal shadow-[0_16px_30px_-22px_rgba(15,23,42,0.22)] dark:border-offwhite/10 dark:bg-white/8 dark:text-offwhite"
                   aria-label="Close project archive"
+                  whileHover={{ y: -2, scale: 1.05, backgroundColor: "rgba(255,255,255,0.9)" }}
+                  whileTap={{ scale: 0.92 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 22 }}
                 >
                   <X className="h-4 w-4" />
-                </button>
+                </motion.button>
               </div>
 
               <div className="min-h-0 flex-1 overflow-y-auto px-8 py-8 sm:px-10 sm:py-10">
-                <div className="flex flex-col gap-10">
+                <motion.div
+                  className="flex flex-col gap-10"
+                  initial="hidden"
+                  animate="visible"
+                  variants={{
+                    hidden: {},
+                    visible: { transition: { staggerChildren: 0.08, delayChildren: 0.15 } },
+                  }}
+                >
                   {projects.map((project, idx) => (
-                    <ProjectCard key={project.id} {...project} index={idx} compact />
+                    <motion.div
+                      key={project.id}
+                      variants={{
+                        hidden: { opacity: 0, y: 28 },
+                        visible: { opacity: 1, y: 0, transition: { duration: 0.45, ease: [0.25, 0.46, 0.45, 0.94] } },
+                      }}
+                    >
+                      <ProjectCard {...project} index={idx} compact />
+                    </motion.div>
                   ))}
-                </div>
+                </motion.div>
               </div>
             </div>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
       )}
+      </AnimatePresence>
     </section>
   );
 };

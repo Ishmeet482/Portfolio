@@ -127,9 +127,9 @@ const Navbar = ({ immersive = false }: NavbarProps) => {
 
   return (
     <header className="fixed left-1/2 top-0 z-50 -translate-x-1/2 px-4 pt-5 sm:px-6 sm:pt-6">
-      <div
+      <motion.div
         className={cn(
-          "relative inline-flex items-center justify-center overflow-hidden whitespace-nowrap rounded-[22px] border transition-[max-width,padding,box-shadow,background-color,transform,opacity] duration-700 [transition-timing-function:cubic-bezier(0.4,0,0.2,1)]",
+          "relative inline-flex transform-gpu items-center justify-center overflow-hidden whitespace-nowrap rounded-[22px] border transition-[max-width,padding,box-shadow,background-color,transform,opacity] duration-700 [transition-timing-function:cubic-bezier(0.4,0,0.2,1)]",
           "h-[52px] sm:h-14",
           isGreetingVisible
             ? "translate-y-0 scale-100 opacity-100"
@@ -153,15 +153,26 @@ const Navbar = ({ immersive = false }: NavbarProps) => {
               ? "shadow-[0_4px_20px_rgba(0,0,0,0.3),inset_0_1px_0_rgba(255,255,255,0.08)]"
               : "shadow-[0_4px_20px_rgba(0,0,0,0.06),inset_0_1px_0_rgba(255,255,255,0.8)]"
         )}
+        initial={false}
+        animate={{
+          y: isGreetingVisible ? 0 : 8,
+          scale: isGreetingVisible ? 1 : 0.96,
+          opacity: isGreetingVisible ? 1 : 0,
+        }}
+        whileHover={isExpanded ? { y: -1, scale: 1.006 } : undefined}
+        transition={{ type: "spring", stiffness: 320, damping: 34, mass: 0.6 }}
       >
         {/* Inner glow/reflection */}
-        <div 
+        <motion.div 
           className={cn(
             "pointer-events-none absolute inset-0 rounded-[21px]",
             isDarkMode
               ? "bg-gradient-to-b from-white/[0.08] via-transparent to-transparent"
               : "bg-gradient-to-b from-white/80 via-white/20 to-transparent"
           )}
+          initial={false}
+          animate={{ opacity: isScrolled ? 1 : 0.86 }}
+          transition={{ type: "spring", stiffness: 260, damping: 32 }}
         />
         
         {/* Subtle noise texture for glass effect */}
@@ -227,7 +238,7 @@ const Navbar = ({ immersive = false }: NavbarProps) => {
                 const isActive = activeSection === targetSection;
 
                 return (
-                  <a
+                  <motion.a
                     key={link.name}
                     href={link.href}
                     className={cn(
@@ -244,13 +255,16 @@ const Navbar = ({ immersive = false }: NavbarProps) => {
                     style={{
                       animationDelay: isNavVisible ? `${index * 55}ms` : "0ms",
                     }}
+                    whileHover={{ y: -1 }}
+                    whileTap={{ scale: 0.97 }}
+                    transition={{ type: "spring", stiffness: 420, damping: 30, mass: 0.42 }}
                     onClick={(event) => {
                       event.preventDefault();
                       scrollToSection(link.href);
                     }}
                   >
                     {link.name}
-                  </a>
+                  </motion.a>
                 );
               })}
             </nav>
@@ -266,7 +280,7 @@ const Navbar = ({ immersive = false }: NavbarProps) => {
             />
 
             {/* Dark mode toggle */}
-            <button
+            <motion.button
               type="button"
               onClick={() => setIsDarkMode((current) => !current)}
               className={cn(
@@ -279,17 +293,28 @@ const Navbar = ({ immersive = false }: NavbarProps) => {
               style={{
                 animationDelay: isNavVisible ? "260ms" : "0ms",
               }}
+              whileHover={{ y: -1, scale: 1.04 }}
+              whileTap={{ scale: 0.94 }}
+              transition={{ type: "spring", stiffness: 420, damping: 30, mass: 0.42 }}
               aria-label="Toggle dark mode"
             >
-              {isDarkMode ? (
-                <Moon className="h-[18px] w-[18px]" />
-              ) : (
-                <Sun className="h-[18px] w-[18px]" />
-              )}
-            </button>
+              <motion.span
+                key={isDarkMode ? "moon" : "sun"}
+                initial={{ rotate: -18, scale: 0.82, opacity: 0 }}
+                animate={{ rotate: 0, scale: 1, opacity: 1 }}
+                exit={{ rotate: 18, scale: 0.82, opacity: 0 }}
+                transition={{ type: "spring", stiffness: 420, damping: 28, mass: 0.35 }}
+              >
+                {isDarkMode ? (
+                  <Moon className="h-[18px] w-[18px]" />
+                ) : (
+                  <Sun className="h-[18px] w-[18px]" />
+                )}
+              </motion.span>
+            </motion.button>
           </div>
         </div>
-      </div>
+      </motion.div>
     </header>
   );
 };

@@ -2,6 +2,7 @@ import { type CSSProperties, type MouseEvent, useEffect, useRef, useState } from
 import Container from "./ui-components/Container";
 import { ArrowRight } from "lucide-react";
 import { DoodleArrowCurved, DoodleHeart, DoodleSmiley, DoodleWhirlwind } from "./Doodles";
+import { motion } from "framer-motion";
 
 const GithubIcon = ({ className }: { className?: string }) => (
   <svg viewBox="0 0 24 24" className={className} aria-hidden="true" fill="#24292e">
@@ -133,24 +134,51 @@ const StickyNoteChase = () => {
     if (distance > fleeRadius) return;
 
     const now = performance.now();
-    if (now - lastFleeRef.current < 50) return;
+    if (now - lastFleeRef.current < 34) return;
 
     const directionX = distance === 0 ? 1 : deltaX / distance;
     const directionY = distance === 0 ? 0 : deltaY / distance;
     const pressure = (fleeRadius - distance) / fleeRadius;
     const fleeSpeed = 120 + pressure * 140;
     const drift = Math.sin(now / 200) * 12;
-    const nextX = Math.min(
-      rect.width - noteSize - 12,
-      Math.max(12, position.x + directionX * fleeSpeed - directionY * drift)
+    const margin = 16;
+    const maxX = Math.max(margin, rect.width - noteSize - margin);
+    const maxY = Math.max(margin, rect.height - noteSize - margin);
+    let nextX = Math.min(
+      maxX,
+      Math.max(margin, position.x + directionX * fleeSpeed - directionY * drift)
     );
-    const nextY = Math.min(
-      rect.height - noteSize - 12,
-      Math.max(12, position.y + directionY * fleeSpeed + directionX * drift)
+    let nextY = Math.min(
+      maxY,
+      Math.max(margin, position.y + directionY * fleeSpeed + directionX * drift)
     );
+
     const moved = Math.hypot(nextX - position.x, nextY - position.y);
 
-    if (moved < 5) return;
+    if (moved < 8) {
+      const safeSpots = [
+        { x: margin, y: margin },
+        { x: maxX, y: margin },
+        { x: margin, y: maxY },
+        { x: maxX, y: maxY },
+        { x: rect.width * 0.5 - noteSize * 0.5, y: margin },
+        { x: rect.width * 0.5 - noteSize * 0.5, y: maxY },
+        { x: margin, y: rect.height * 0.5 - noteSize * 0.5 },
+        { x: maxX, y: rect.height * 0.5 - noteSize * 0.5 },
+      ].map((spot) => ({
+        x: Math.min(maxX, Math.max(margin, spot.x)),
+        y: Math.min(maxY, Math.max(margin, spot.y)),
+      }));
+
+      const safestSpot = safeSpots.reduce((best, spot) => {
+        const spotDistance = Math.hypot(spot.x + noteSize / 2 - mouseX, spot.y + noteSize / 2 - mouseY);
+        const bestDistance = Math.hypot(best.x + noteSize / 2 - mouseX, best.y + noteSize / 2 - mouseY);
+        return spotDistance > bestDistance ? spot : best;
+      }, safeSpots[0]);
+
+      nextX = safestSpot.x;
+      nextY = safestSpot.y;
+    }
 
     const trailId = now;
     setPosition({ x: nextX, y: nextY });
@@ -177,17 +205,26 @@ const StickyNoteChase = () => {
   };
 
   return (
-    <div
+    <motion.div
       ref={boxRef}
       onMouseMove={handleMouseMove}
-      className="sticky-chase-box relative w-full h-full min-h-[350px] overflow-hidden rounded-[24px] border border-amber-900/12 bg-[#fffaf1] shadow-[inset_0_1px_8px_rgba(80,53,24,0.08),0_18px_45px_-34px_rgba(54,42,24,0.45)] dark:border-white/10 dark:bg-[#24211d]"
+      className="sticky-chase-box relative w-full h-full min-h-[350px] overflow-hidden rounded-[24px] border border-amber-900/12 bg-[#fffaf1] shadow-[inset_0_1px_0_rgba(255,255,255,0.72),inset_0_-18px_42px_-34px_rgba(80,53,24,0.18),0_18px_45px_-34px_rgba(54,42,24,0.45)] dark:border-white/10 dark:bg-[#24211d] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.06),inset_0_-18px_42px_-34px_rgba(255,255,255,0.08),0_18px_45px_-34px_rgba(0,0,0,0.72)]"
       aria-label="Interactive sticky note chase area"
+      initial={false}
+      whileHover={{ y: -2 }}
+      transition={{ type: "spring", stiffness: 260, damping: 30, mass: 0.6 }}
     >
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_18%_14%,rgba(255,255,255,0.58),transparent_30%),linear-gradient(145deg,rgba(255,255,255,0.18)_0%,rgba(255,250,241,0)_44%,rgba(80,53,24,0.08)_100%)] dark:bg-[radial-gradient(circle_at_18%_14%,rgba(255,255,255,0.08),transparent_30%),linear-gradient(145deg,rgba(255,255,255,0.06)_0%,rgba(36,33,29,0)_44%,rgba(0,0,0,0.18)_100%)]" />
+      <div className="pointer-events-none absolute inset-[1px] rounded-[23px] border border-white/45 dark:border-white/[0.06]" />
+
       <div className="pointer-events-none absolute inset-0">
         {trails.map((trail) => (
-          <span
+          <motion.span
             key={trail.id}
-            className="sticky-trail absolute select-none font-semibold text-[var(--text-primary)]"
+            className="sticky-trail absolute max-w-[9rem] select-none text-center text-[0.78rem] font-semibold leading-tight text-[var(--text-primary)]"
+            initial={{ opacity: 0, scale: 0.86, y: 6 }}
+            animate={{ opacity: 0.72, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.94 }}
             style={{
               left: `${trail.x}%`,
               top: `${trail.y}%`,
@@ -196,25 +233,33 @@ const StickyNoteChase = () => {
             } as CSSProperties}
           >
             {trail.text}
-          </span>
+          </motion.span>
         ))}
       </div>
 
-      <button
+      <motion.button
         type="button"
         onClick={handleTap}
-        className="sticky-note absolute flex items-center justify-center overflow-hidden text-center text-[0.8rem] font-bold leading-[1.2] text-[#3f321b] transition-transform duration-75 ease-out will-change-transform max-md:text-[0.72rem]"
+        className="sticky-note absolute flex items-center justify-center overflow-hidden rounded-[10px] text-center text-[0.78rem] font-bold leading-[1.12] text-[#3f321b] shadow-[0_18px_32px_-20px_rgba(80,53,24,0.52)] will-change-transform max-md:text-[0.7rem]"
+        animate={{ x: position.x, y: position.y, rotate: -4 }}
+        transition={{ type: "spring", stiffness: 520, damping: 34, mass: 0.42 }}
+        whileHover={{ rotate: -2, scale: 1.02 }}
+        whileTap={{ scale: 0.96 }}
         style={{
           width: isTouch ? 104 : 128,
           height: isTouch ? 104 : 128,
-          transform: `translate3d(${position.x}px, ${position.y}px, 0) rotate(-4deg)`,
           fontFamily: '"Comic Sans MS", "Bradley Hand", cursive',
         }}
         aria-label={`Sticky note: ${chasePhrases[phraseIndex]}`}
       >
-        <span className="relative z-10 w-full break-words px-2.5 py-1 text-center hyphens-auto" style={{ wordBreak: 'break-word', overflowWrap: 'break-word' }}>{chasePhrases[phraseIndex]}</span>
-      </button>
-    </div>
+        <span
+          className="relative z-10 flex h-full w-full items-center justify-center overflow-hidden text-balance break-words px-3 py-2 text-center hyphens-auto"
+          style={{ wordBreak: "break-word", overflowWrap: "anywhere" }}
+        >
+          {chasePhrases[phraseIndex]}
+        </span>
+      </motion.button>
+    </motion.div>
   );
 };
 
@@ -244,22 +289,24 @@ const Footer = () => {
             <StickyNoteChase />
           </div>
 
-          <div className="relative flex w-full flex-col items-start gap-6 text-[var(--text-primary)] p-4 lg:p-6">
+          <div
+            className="relative flex w-full flex-col items-start gap-7 p-4 text-[var(--text-primary)] lg:p-6"
+          >
             {/* Heart doodle accent */}
             <DoodleHeart className="absolute -right-2 top-6 h-6 w-7 doodle-pulse hidden md:block" />
-            <div className="relative space-y-3">
-              <p className="text-[clamp(2.4rem,4vw,3.3rem)] font-black uppercase leading-[0.85] tracking-normal text-[var(--text-primary)]">
+            <div className="relative space-y-4">
+              <p className="pointer-events-none relative select-none text-[clamp(2.8rem,5.5vw,4.5rem)] font-extrabold uppercase leading-[0.96] tracking-tight text-[rgba(50,44,32,0.10)] [text-shadow:0_1px_0_rgba(255,255,255,0.7)] dark:text-[rgba(255,252,245,0.065)] dark:[text-shadow:0_1px_0_rgba(255,255,255,0.06),0_-1px_0_rgba(0,0,0,0.18)]">
                 COULDN'T CATCH ME THERE?
               </p>
-              <p className="text-[clamp(1.55rem,2.4vw,2.55rem)] font-extrabold leading-[0.98] tracking-normal text-[#2d6a4f] dark:text-[#7dd9ad] relative inline-block">
+              <p className="relative inline-block text-[clamp(1.55rem,2.4vw,2.55rem)] font-semibold leading-[1.02] tracking-[-0.01em] text-[#2d6a4f] dark:text-[#7dd9ad]">
                 Reach out to me here
                 {/* Curved arrow pointing to contact links */}
                 <DoodleArrowCurved className="absolute -bottom-6 right-0 h-6 w-14 rotate-[160deg] hidden lg:block" />
               </p>
-              <h2 className="text-[clamp(1.45rem,2.4vw,2.25rem)] font-extrabold leading-[1.01] tracking-normal text-[var(--text-primary)]">
+              <h2 className="text-[clamp(1.45rem,2.4vw,2.25rem)] font-bold leading-[1.06] tracking-tight text-[var(--text-primary)]">
                 Let's build something together.
               </h2>
-              <p className="max-w-md text-sm leading-relaxed text-[color-mix(in_srgb,var(--text-primary)_62%,transparent)] md:text-[0.84rem]">
+              <p className="max-w-md text-sm leading-[1.75] text-[color-mix(in_srgb,var(--text-primary)_62%,transparent)] md:text-[0.86rem]">
                 Open to backend, systems &amp; SDE roles — currently exploring new opportunities.
               </p>
             </div>
@@ -282,35 +329,92 @@ const Footer = () => {
               </button>
             </div>
 
-            <div className="flex w-full flex-col items-start gap-2">
-              <div className="flex flex-wrap gap-2 md:flex-nowrap">
-                {contactLinks.slice(0, 3).map((link) => (
-                  <a
+            <div className="flex w-full flex-col items-start gap-2.5">
+              <div className="flex flex-wrap gap-2.5 md:flex-nowrap">
+                {contactLinks.slice(0, 3).map((link, idx) => (
+                  <motion.a
                     key={link.name}
                     href={link.url}
                     target={link.external ? "_blank" : undefined}
                     rel={link.external ? "noopener noreferrer" : undefined}
-                    className="group inline-flex items-center gap-1.5 rounded-full border border-amber-900/14 bg-white/35 px-3.5 py-1.5 text-[0.72rem] font-semibold text-[color-mix(in_srgb,var(--text-primary)_78%,transparent)] transition-all duration-200 hover:-translate-y-0.5 hover:border-amber-900/28 hover:bg-amber-100/35 hover:text-[var(--text-primary)] hover:shadow-[0_8px_20px_-16px_rgba(80,53,24,0.5)] dark:border-white/12 dark:bg-white/6 dark:hover:border-white/24 dark:hover:bg-white/10"
+                    className="group relative inline-flex items-center gap-2 overflow-hidden rounded-full border border-amber-900/12 bg-white/50 px-4 py-2 text-[0.74rem] font-semibold text-[color-mix(in_srgb,var(--text-primary)_82%,transparent)] backdrop-blur-md dark:border-white/10 dark:bg-white/8"
                     aria-label={link.name}
+                    initial={{ opacity: 0, y: 12 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.1 + idx * 0.06, type: "spring", stiffness: 400, damping: 28 }}
+                    whileHover={{ y: -3, scale: 1.03 }}
+                    whileTap={{ scale: 0.97, y: 0 }}
+                    style={{
+                      boxShadow: "0 4px 16px -8px rgba(80,53,24,0.18), inset 0 1px 0 rgba(255,255,255,0.65)",
+                    }}
                   >
-                    <link.Icon className={`h-[0.95rem] w-[0.95rem] flex-shrink-0${link.darkInvert ? " dark:invert" : ""}`} />
-                    <span className="whitespace-nowrap">{link.handle}</span>
-                  </a>
+                    {/* shimmer sweep */}
+                    <motion.span
+                      className="pointer-events-none absolute inset-0 -translate-x-full skew-x-[-18deg] bg-gradient-to-r from-transparent via-white/40 to-transparent"
+                      whileHover={{ translateX: "200%" }}
+                      transition={{ duration: 0.5, ease: "easeInOut" }}
+                    />
+                    {/* inner bevel */}
+                    <span className="pointer-events-none absolute inset-[1px] rounded-full border border-white/50 dark:border-white/5" />
+                    {/* glow ring */}
+                    <motion.span
+                      className="pointer-events-none absolute inset-0 rounded-full"
+                      initial={{ boxShadow: "0 0 0px 0px rgba(80,53,24,0)" }}
+                      whileHover={{ boxShadow: "0 0 0px 3px rgba(80,53,24,0.08)" }}
+                      transition={{ duration: 0.2 }}
+                    />
+                    {/* icon with bounce */}
+                    <motion.span
+                      className="relative flex-shrink-0"
+                      whileHover={{ scale: 1.15, rotate: 6 }}
+                      transition={{ type: "spring", stiffness: 500, damping: 18 }}
+                    >
+                      <link.Icon className={`h-4 w-4${link.darkInvert ? " dark:invert" : ""}`} />
+                    </motion.span>
+                    <span className="relative whitespace-nowrap">{link.handle}</span>
+                  </motion.a>
                 ))}
               </div>
-              <div className="flex flex-wrap gap-2 md:flex-nowrap">
-                {contactLinks.slice(3).map((link) => (
-                  <a
+              <div className="flex flex-wrap gap-2.5 md:flex-nowrap">
+                {contactLinks.slice(3).map((link, idx) => (
+                  <motion.a
                     key={link.name}
                     href={link.url}
                     target={link.external ? "_blank" : undefined}
                     rel={link.external ? "noopener noreferrer" : undefined}
-                    className="group inline-flex items-center gap-1.5 rounded-full border border-amber-900/14 bg-white/35 px-3.5 py-1.5 text-[0.72rem] font-semibold text-[color-mix(in_srgb,var(--text-primary)_78%,transparent)] transition-all duration-200 hover:-translate-y-0.5 hover:border-amber-900/28 hover:bg-amber-100/35 hover:text-[var(--text-primary)] hover:shadow-[0_8px_20px_-16px_rgba(80,53,24,0.5)] dark:border-white/12 dark:bg-white/6 dark:hover:border-white/24 dark:hover:bg-white/10"
+                    className="group relative inline-flex items-center gap-2 overflow-hidden rounded-full border border-amber-900/12 bg-white/50 px-4 py-2 text-[0.74rem] font-semibold text-[color-mix(in_srgb,var(--text-primary)_82%,transparent)] backdrop-blur-md dark:border-white/10 dark:bg-white/8"
                     aria-label={link.name}
+                    initial={{ opacity: 0, y: 12 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.28 + idx * 0.06, type: "spring", stiffness: 400, damping: 28 }}
+                    whileHover={{ y: -3, scale: 1.03 }}
+                    whileTap={{ scale: 0.97, y: 0 }}
+                    style={{
+                      boxShadow: "0 4px 16px -8px rgba(80,53,24,0.18), inset 0 1px 0 rgba(255,255,255,0.65)",
+                    }}
                   >
-                    <link.Icon className={`h-[0.95rem] w-[0.95rem] flex-shrink-0${link.darkInvert ? " dark:invert" : ""}`} />
-                    <span className="whitespace-nowrap">{link.handle}</span>
-                  </a>
+                    {/* shimmer sweep */}
+                    <motion.span
+                      className="pointer-events-none absolute inset-0 -translate-x-full skew-x-[-18deg] bg-gradient-to-r from-transparent via-white/40 to-transparent"
+                      whileHover={{ translateX: "200%" }}
+                      transition={{ duration: 0.5, ease: "easeInOut" }}
+                    />
+                    <span className="pointer-events-none absolute inset-[1px] rounded-full border border-white/50 dark:border-white/5" />
+                    <motion.span
+                      className="pointer-events-none absolute inset-0 rounded-full"
+                      initial={{ boxShadow: "0 0 0px 0px rgba(80,53,24,0)" }}
+                      whileHover={{ boxShadow: "0 0 0px 3px rgba(80,53,24,0.08)" }}
+                      transition={{ duration: 0.2 }}
+                    />
+                    <motion.span
+                      className="relative flex-shrink-0"
+                      whileHover={{ scale: 1.15, rotate: 6 }}
+                      transition={{ type: "spring", stiffness: 500, damping: 18 }}
+                    >
+                      <link.Icon className={`h-4 w-4${link.darkInvert ? " dark:invert" : ""}`} />
+                    </motion.span>
+                    <span className="relative whitespace-nowrap">{link.handle}</span>
+                  </motion.a>
                 ))}
               </div>
             </div>

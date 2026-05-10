@@ -1,5 +1,5 @@
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Caveat:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Inter:wght@300;400;500;600;700;800;900&family=Caveat:wght@400;500;600;700&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -970,4 +970,28 @@
     width: 0.78rem;
     height: 0.78rem;
   }
+}
+
+/* ── Tilted Photo Ticker ── */
+@keyframes ticker-scroll-up {
+  from { transform: translateY(0); }
+  to { transform: translateY(-50%); }
+}
+
+@keyframes ticker-scroll-down {
+  from { transform: translateY(-50%); }
+  to { transform: translateY(0); }
+}
+
+.ticker-col {
+  animation: ticker-scroll-up var(--ticker-speed, 30s) linear infinite;
+}
+
+.ticker-col-reverse {
+  animation: ticker-scroll-down var(--ticker-speed, 25s) linear infinite;
+}
+
+.gallery-ticker:hover .ticker-col,
+.gallery-ticker:hover .ticker-col-reverse {
+  animation-play-state: paused;
 }
