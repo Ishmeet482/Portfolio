@@ -1,6 +1,7 @@
 import { Suspense, lazy } from "react";
 import { HashRouter, Routes, Route } from "react-router-dom";
 import { SpeedInsights } from "@vercel/speed-insights/react";
+import ScrollProgressTopButton from "./components/ScrollProgressTopButton";
 import Index from "./pages/Index";
 const Photography = lazy(() => import("./pages/Photography"));
 const Gaming = lazy(() => import("./pages/Gaming"));
@@ -18,6 +19,7 @@ const App = () => (
         <Route path="*" element={<NotFound />} />
       </Routes>
     </Suspense>
+    <ScrollProgressTopButton />
     <SpeedInsights />
   </HashRouter>
 );

@@ -1,13 +1,14 @@
-import { useEffect, useRef, useState } from "react";
-import { Moon, Sun } from "lucide-react";
+import { useEffect, useState } from "react";
+import { FolderKanban, Home, Layers3, Mail, Moon, Sun, UserRound, type LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 
-const navLinks = [
-  { name: "Work", href: "#projects" },
-  { name: "Stack", href: "#stack" },
-  { name: "Story", href: "#about" },
-  { name: "Contact", href: "#contact" },
+const navLinks: { name: string; href: string; icon: LucideIcon }[] = [
+  { name: "Home", href: "#hero", icon: Home },
+  { name: "About Me", href: "#about", icon: UserRound },
+  { name: "Projects", href: "#projects", icon: FolderKanban },
+  { name: "Stack", href: "#stack", icon: Layers3 },
+  { name: "Contact", href: "#contact", icon: Mail },
 ];
 
 interface NavbarProps {
@@ -30,8 +31,8 @@ const Navbar = ({ immersive = false }: NavbarProps) => {
   const [isNavVisible, setIsNavVisible] = useState(immersive);
   const [greeting, setGreeting] = useState("");
   const [isGreetingVisible, setIsGreetingVisible] = useState(immersive);
-  const navRef = useRef<HTMLElement>(null);
-  const [indicatorStyle, setIndicatorStyle] = useState({ left: 0, width: 0 });
+  const [isNavHovered, setIsNavHovered] = useState(false);
+  const [hoveredLink, setHoveredLink] = useState<string | null>(null);
 
   useEffect(() => {
     const storedDarkMode = localStorage.getItem("darkMode") === "true";
@@ -86,32 +87,6 @@ const Navbar = ({ immersive = false }: NavbarProps) => {
     document.documentElement.classList.toggle("dark", isDarkMode);
     localStorage.setItem("darkMode", String(isDarkMode));
   }, [isDarkMode]);
-
-  useEffect(() => {
-    if (!navRef.current || !isNavVisible) return;
-    
-    const activeIndex = navLinks.findIndex(
-      (link) => link.href.replace("#", "") === activeSection
-    );
-    
-    if (activeIndex === -1) {
-      setIndicatorStyle({ left: 0, width: 0 });
-      return;
-    }
-
-    const navElement = navRef.current;
-    const links = navElement.querySelectorAll("a");
-    const activeLink = links[activeIndex];
-    
-    if (activeLink) {
-      const navRect = navElement.getBoundingClientRect();
-      const linkRect = activeLink.getBoundingClientRect();
-      setIndicatorStyle({
-        left: linkRect.left - navRect.left,
-        width: linkRect.width,
-      });
-    }
-  }, [activeSection, isNavVisible]);
 
   const scrollToSection = (sectionId: string) => {
     const element = document.querySelector(sectionId);
@@ -200,70 +175,103 @@ const Navbar = ({ immersive = false }: NavbarProps) => {
           </div>
 
           {/* Navigation */}
-          <div
+          <motion.div
             className={cn(
-              "flex w-max items-center justify-between gap-1.5 sm:gap-2",
+              "flex w-max items-center justify-between gap-1 sm:gap-1.5",
               !isNavVisible && "pointer-events-none"
             )}
+            onHoverStart={() => setIsNavHovered(true)}
+            onHoverEnd={() => {
+              setIsNavHovered(false);
+              setHoveredLink(null);
+            }}
           >
             <nav 
-              ref={navRef}
-              className="relative flex min-w-0 items-center justify-center"
+              className="relative flex min-w-0 items-center justify-center gap-0.5"
+              aria-label="Primary navigation"
             >
-              {/* Animated indicator pill */}
-              {isNavVisible && indicatorStyle.width > 0 && (
-                <motion.div
-                  className={cn(
-                    "absolute top-1/2 h-[calc(100%-8px)] rounded-[14px]",
-                    isDarkMode
-                      ? "bg-white/[0.15] shadow-[inset_0_1px_0_rgba(255,255,255,0.2),0_2px_8px_-2px_rgba(0,0,0,0.4)]"
-                      : "bg-black/[0.08] shadow-[inset_0_1px_0_rgba(255,255,255,0.8),0_1px_3px_-1px_rgba(0,0,0,0.1)]"
-                  )}
-                  initial={false}
-                  animate={{
-                    left: indicatorStyle.left,
-                    width: indicatorStyle.width,
-                    y: "-50%",
-                  }}
-                  transition={{
-                    type: "spring",
-                    stiffness: 400,
-                    damping: 30,
-                  }}
-                />
-              )}
-
               {navLinks.map((link, index) => {
                 const targetSection = link.href.replace("#", "");
                 const isActive = activeSection === targetSection;
+                const isHovered = hoveredLink === link.name;
+                const shouldRevealLabel = isNavHovered || isHovered;
+                const Icon = link.icon;
 
                 return (
                   <motion.a
                     key={link.name}
                     href={link.href}
                     className={cn(
-                      "relative z-10 rounded-[14px] px-4 py-2 text-[0.82rem] font-medium tracking-[0.01em] opacity-0 transition-colors duration-200 sm:px-5 sm:text-[0.88rem]",
+                      "group/item relative z-10 flex h-10 items-center overflow-hidden rounded-[16px] px-3 text-[0.82rem] font-medium tracking-[0.01em] opacity-0 transition-colors duration-200 sm:h-11 sm:px-3.5 sm:text-[0.88rem]",
                       isNavVisible && "nav-item-enter",
                       isActive
                         ? isDarkMode
                           ? "text-white font-semibold"
                           : "text-gray-900 font-semibold"
                         : isDarkMode
-                          ? "text-white/60 hover:text-white/90"
-                          : "text-gray-600 hover:text-gray-900"
+                          ? "text-white/58 hover:text-white/92"
+                          : "text-gray-600 hover:text-gray-950"
                     )}
                     style={{
                       animationDelay: isNavVisible ? `${index * 55}ms` : "0ms",
                     }}
-                    whileHover={{ y: -1 }}
-                    whileTap={{ scale: 0.97 }}
-                    transition={{ type: "spring", stiffness: 420, damping: 30, mass: 0.42 }}
+                    animate={{
+                      boxShadow: isHovered
+                        ? isDarkMode
+                          ? "0 10px 24px -18px rgba(255,255,255,0.44)"
+                          : "0 10px 22px -18px rgba(28,25,23,0.26)"
+                        : "0 0 0 0 rgba(0,0,0,0)",
+                    }}
+                    whileHover={{ y: -1.5, scale: 1.018 }}
+                    whileTap={{ scale: 0.965, y: 0 }}
+                    transition={{ type: "spring", stiffness: 360, damping: 32, mass: 0.48 }}
+                    onHoverStart={() => setHoveredLink(link.name)}
+                    onHoverEnd={() => setHoveredLink(null)}
+                    onFocus={() => setHoveredLink(link.name)}
+                    onBlur={() => setHoveredLink(null)}
+                    aria-current={isActive ? "page" : undefined}
                     onClick={(event) => {
                       event.preventDefault();
                       scrollToSection(link.href);
                     }}
                   >
-                    {link.name}
+                    {isActive && (
+                      <motion.span
+                        layoutId="navbar-active-pill"
+                        className={cn(
+                          "absolute inset-1 rounded-[13px]",
+                          isDarkMode
+                            ? "bg-white/[0.14] shadow-[inset_0_1px_0_rgba(255,255,255,0.22),0_7px_18px_-14px_rgba(255,255,255,0.42)]"
+                            : "bg-black/[0.075] shadow-[inset_0_1px_0_rgba(255,255,255,0.9),0_6px_14px_-12px_rgba(28,25,23,0.28)]"
+                        )}
+                        transition={{ type: "spring", stiffness: 430, damping: 36, mass: 0.55 }}
+                      />
+                    )}
+                    <motion.span
+                      className={cn(
+                        "pointer-events-none absolute inset-1 rounded-[13px] opacity-0",
+                        isDarkMode
+                          ? "bg-white/[0.1]"
+                          : "bg-white/70"
+                      )}
+                      animate={{ opacity: isHovered ? 1 : 0 }}
+                      transition={{ duration: 0.24, ease: "easeInOut" }}
+                    />
+                    <span className="relative flex items-center">
+                      <Icon className="h-[17px] w-[17px] shrink-0 stroke-[1.85] sm:h-[18px] sm:w-[18px]" />
+                      <motion.span
+                        className="overflow-hidden whitespace-nowrap"
+                        initial={false}
+                        animate={{
+                          maxWidth: shouldRevealLabel ? 86 : 0,
+                          opacity: shouldRevealLabel ? 1 : 0,
+                          marginLeft: shouldRevealLabel ? 8 : 0,
+                        }}
+                        transition={{ type: "spring", stiffness: 380, damping: 34, mass: 0.5 }}
+                      >
+                        {link.name}
+                      </motion.span>
+                    </span>
                   </motion.a>
                 );
               })}
@@ -312,7 +320,7 @@ const Navbar = ({ immersive = false }: NavbarProps) => {
                 )}
               </motion.span>
             </motion.button>
-          </div>
+          </motion.div>
         </div>
       </motion.div>
     </header>

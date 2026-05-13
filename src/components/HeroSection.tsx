@@ -321,18 +321,67 @@ const HeroSection = () => {
           <div className="flex flex-col justify-center gap-8">
 
             {/* Availability badge */}
-            <div
+            <motion.div
               ref={badgeRef}
-              className="opacity-0 inline-flex w-fit items-center gap-2.5 rounded-full border border-black/10 bg-[linear-gradient(135deg,rgba(255,251,238,0.88),rgba(255,255,255,0.58))] px-4 py-2 backdrop-blur-xl shadow-[0_8px_24px_-12px_rgba(15,23,42,0.16)] dark:border-offwhite/12 dark:bg-[linear-gradient(135deg,rgba(40,36,46,0.88),rgba(28,26,34,0.72))]"
+              className="group relative inline-flex w-fit cursor-default rounded-full opacity-0 outline-none"
+              animate={{ y: [0, -1.5, 0] }}
+              whileHover={{ y: -3, transition: { duration: 0.3, ease: "easeInOut" } }}
+              whileTap={{ scale: 0.985, transition: { duration: 0.12, ease: "easeOut" } }}
+              transition={{ duration: 5.8, repeat: Infinity, ease: "easeInOut" }}
+              style={{
+                boxShadow:
+                  "0 14px 34px -20px rgba(16,185,129,0.42), 0 10px 26px -18px rgba(15,23,42,0.26)",
+              }}
             >
-              <span className="relative flex h-2 w-2 shrink-0">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
-                <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
-              </span>
-              <span className="text-[0.72rem] font-semibold uppercase tracking-[0.08em] text-charcoal/68 dark:text-offwhite/68">
-                Available for SDE &amp; AI/ML roles · 2026
-              </span>
-            </div>
+              <motion.span
+                className="pointer-events-none absolute -inset-4 rounded-full bg-[radial-gradient(circle_at_center,rgba(16,185,129,0.28),rgba(16,185,129,0.09)_42%,transparent_72%)] blur-2xl"
+                animate={{ opacity: [0.32, 0.62, 0.32], scale: [0.96, 1.04, 0.96] }}
+                transition={{ duration: 4.8, repeat: Infinity, ease: "easeInOut" }}
+              />
+              <motion.span
+                className="pointer-events-none absolute -inset-px rounded-full bg-[linear-gradient(110deg,rgba(16,185,129,0.16),rgba(255,255,255,0.72),rgba(52,211,153,0.58),rgba(255,255,255,0.18),rgba(16,185,129,0.16))] opacity-70 blur-[0.2px]"
+                style={{ backgroundSize: "220% 100%" }}
+                animate={{ backgroundPosition: ["180% 0%", "-80% 0%"], opacity: [0.52, 0.82, 0.52] }}
+                transition={{ duration: 6.5, repeat: Infinity, ease: "easeInOut" }}
+              />
+              <motion.span
+                className="pointer-events-none absolute inset-0 rounded-full"
+                animate={{
+                  boxShadow: [
+                    "0 0 0 1px rgba(16,185,129,0.10), 0 0 22px rgba(16,185,129,0.08)",
+                    "0 0 0 1px rgba(16,185,129,0.24), 0 0 34px rgba(16,185,129,0.16)",
+                    "0 0 0 1px rgba(16,185,129,0.10), 0 0 22px rgba(16,185,129,0.08)",
+                  ],
+                }}
+                whileHover={{
+                  boxShadow: "0 0 0 1px rgba(16,185,129,0.32), 0 0 38px rgba(16,185,129,0.22)",
+                }}
+                transition={{ duration: 4.2, repeat: Infinity, ease: "easeInOut" }}
+              />
+
+              <div className="relative z-10 inline-flex items-center gap-2.5 overflow-hidden rounded-full border border-black/10 bg-[linear-gradient(135deg,rgba(255,251,238,0.92),rgba(255,255,255,0.68))] px-4 py-2 backdrop-blur-xl shadow-[inset_0_1px_0_rgba(255,255,255,0.74)] dark:border-offwhite/12 dark:bg-[linear-gradient(135deg,rgba(40,36,46,0.9),rgba(28,26,34,0.76))]">
+                <motion.span
+                  className="pointer-events-none absolute inset-0 -translate-x-2/3 bg-[linear-gradient(105deg,transparent_20%,rgba(255,255,255,0.34)_48%,rgba(52,211,153,0.18)_52%,transparent_78%)]"
+                  animate={{ translateX: ["-70%", "70%"] }}
+                  transition={{ duration: 7.2, repeat: Infinity, ease: "easeInOut" }}
+                />
+                <span className="relative flex h-2 w-2 shrink-0">
+                  <motion.span
+                    className="absolute inline-flex h-full w-full rounded-full bg-emerald-400"
+                    animate={{ scale: [1, 2.15, 1], opacity: [0.55, 0, 0.55] }}
+                    transition={{ duration: 2.4, repeat: Infinity, ease: "easeInOut" }}
+                  />
+                  <motion.span
+                    className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.72)]"
+                    animate={{ boxShadow: ["0 0 8px rgba(16,185,129,0.55)", "0 0 14px rgba(16,185,129,0.85)", "0 0 8px rgba(16,185,129,0.55)"] }}
+                    transition={{ duration: 2.4, repeat: Infinity, ease: "easeInOut" }}
+                  />
+                </span>
+                <span className="relative text-[0.72rem] font-semibold uppercase tracking-[0.08em] text-charcoal/68 dark:text-offwhite/68">
+                  Available for SDE &amp; AI/ML roles · 2026
+                </span>
+              </div>
+            </motion.div>
 
             {/* Main heading */}
             <div ref={headingRef} className="opacity-0 relative">
