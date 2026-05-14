@@ -33,13 +33,42 @@ const Navbar = ({ immersive = false }: NavbarProps) => {
   const [isGreetingVisible, setIsGreetingVisible] = useState(immersive);
   const [isNavHovered, setIsNavHovered] = useState(false);
   const [hoveredLink, setHoveredLink] = useState<string | null>(null);
+  const [isMobileNav, setIsMobileNav] = useState(false);
 
   useEffect(() => {
     const storedDarkMode = localStorage.getItem("darkMode") === "true";
     setIsDarkMode(storedDarkMode);
     setGreeting(getGreeting());
 
-    if (immersive) return;
+    const mobileQuery = window.matchMedia("(max-width: 639px)");
+    const handleMobileChange = () => {
+      setIsMobileNav(mobileQuery.matches);
+
+      if (mobileQuery.matches) {
+        setIsExpanded(true);
+        setIsNavVisible(true);
+        setIsGreetingVisible(true);
+        setIsNavHovered(false);
+        setHoveredLink(null);
+      }
+    };
+
+    handleMobileChange();
+    if (mobileQuery.addEventListener) {
+      mobileQuery.addEventListener("change", handleMobileChange);
+    } else {
+      mobileQuery.addListener(handleMobileChange);
+    }
+
+    if (immersive) {
+      return () => {
+        if (mobileQuery.removeEventListener) {
+          mobileQuery.removeEventListener("change", handleMobileChange);
+        } else {
+          mobileQuery.removeListener(handleMobileChange);
+        }
+      };
+    }
 
     const entranceFrame = window.requestAnimationFrame(() => {
       setIsGreetingVisible(true);
@@ -79,6 +108,11 @@ const Navbar = ({ immersive = false }: NavbarProps) => {
         window.clearTimeout(expansionTimer);
         window.clearTimeout(navRevealTimer);
       }
+      if (mobileQuery.removeEventListener) {
+        mobileQuery.removeEventListener("change", handleMobileChange);
+      } else {
+        mobileQuery.removeListener(handleMobileChange);
+      }
       window.removeEventListener("scroll", handleScroll);
     };
   }, [immersive]);
@@ -101,19 +135,19 @@ const Navbar = ({ immersive = false }: NavbarProps) => {
   };
 
   return (
-    <header className="fixed left-1/2 top-0 z-50 -translate-x-1/2 px-4 pt-5 sm:px-6 sm:pt-6">
+    <header className="fixed inset-x-0 top-0 z-50 flex justify-center px-2 pt-4 sm:px-6 sm:pt-6">
       <motion.div
         className={cn(
           "relative inline-flex transform-gpu items-center justify-center overflow-hidden whitespace-nowrap rounded-[22px] border transition-[max-width,padding,box-shadow,background-color,transform,opacity] duration-700 [transition-timing-function:cubic-bezier(0.4,0,0.2,1)]",
-          "h-[52px] sm:h-14",
+          "h-[48px] sm:h-14",
           isGreetingVisible
             ? "translate-y-0 scale-100 opacity-100"
             : "translate-y-2 scale-[0.96] opacity-0",
           isExpanded
-            ? "max-w-[calc(100vw-2rem)] sm:max-w-[calc(100vw-3rem)]"
-            : "max-w-[11.25rem] sm:max-w-[12rem]",
+            ? "max-w-[calc(100vw-1rem)] sm:max-w-[calc(100vw-3rem)]"
+            : "max-w-[10.5rem] sm:max-w-[12rem]",
           isExpanded
-            ? "px-2 sm:px-2.5"
+            ? "px-1.5 sm:px-2.5"
             : "px-4 sm:px-5",
           // Enhanced glassmorphism effect
           isDarkMode
@@ -134,7 +168,7 @@ const Navbar = ({ immersive = false }: NavbarProps) => {
           scale: isGreetingVisible ? 1 : 0.96,
           opacity: isGreetingVisible ? 1 : 0,
         }}
-        whileHover={isExpanded ? { y: -1, scale: 1.006 } : undefined}
+        whileHover={isExpanded && !isMobileNav ? { y: -1, scale: 1.006 } : undefined}
         transition={{ type: "spring", stiffness: 320, damping: 34, mass: 0.6 }}
       >
         {/* Inner glow/reflection */}
@@ -177,10 +211,12 @@ const Navbar = ({ immersive = false }: NavbarProps) => {
           {/* Navigation */}
           <motion.div
             className={cn(
-              "flex w-max items-center justify-between gap-1 sm:gap-1.5",
+              "flex w-max max-w-full items-center justify-between gap-0.5 sm:gap-1.5",
               !isNavVisible && "pointer-events-none"
             )}
-            onHoverStart={() => setIsNavHovered(true)}
+            onHoverStart={() => {
+              if (!isMobileNav) setIsNavHovered(true);
+            }}
             onHoverEnd={() => {
               setIsNavHovered(false);
               setHoveredLink(null);
@@ -194,7 +230,7 @@ const Navbar = ({ immersive = false }: NavbarProps) => {
                 const targetSection = link.href.replace("#", "");
                 const isActive = activeSection === targetSection;
                 const isHovered = hoveredLink === link.name;
-                const shouldRevealLabel = isNavHovered || isHovered;
+                const shouldRevealLabel = !isMobileNav && (isNavHovered || isHovered);
                 const Icon = link.icon;
 
                 return (
@@ -202,7 +238,7 @@ const Navbar = ({ immersive = false }: NavbarProps) => {
                     key={link.name}
                     href={link.href}
                     className={cn(
-                      "group/item relative z-10 flex h-10 items-center overflow-hidden rounded-[16px] px-3 text-[0.82rem] font-medium tracking-[0.01em] opacity-0 transition-colors duration-200 sm:h-11 sm:px-3.5 sm:text-[0.88rem]",
+                      "group/item relative z-10 flex h-9 w-9 items-center justify-center overflow-hidden rounded-[14px] text-[0.82rem] font-medium tracking-[0.01em] opacity-0 transition-colors duration-200 sm:h-11 sm:w-auto sm:justify-start sm:rounded-[16px] sm:px-3.5 sm:text-[0.88rem]",
                       isNavVisible && "nav-item-enter",
                       isActive
                         ? isDarkMode
@@ -222,12 +258,16 @@ const Navbar = ({ immersive = false }: NavbarProps) => {
                           : "0 10px 22px -18px rgba(28,25,23,0.26)"
                         : "0 0 0 0 rgba(0,0,0,0)",
                     }}
-                    whileHover={{ y: -1.5, scale: 1.018 }}
+                    whileHover={isMobileNav ? undefined : { y: -1.5, scale: 1.018 }}
                     whileTap={{ scale: 0.965, y: 0 }}
                     transition={{ type: "spring", stiffness: 360, damping: 32, mass: 0.48 }}
-                    onHoverStart={() => setHoveredLink(link.name)}
+                    onHoverStart={() => {
+                      if (!isMobileNav) setHoveredLink(link.name);
+                    }}
                     onHoverEnd={() => setHoveredLink(null)}
-                    onFocus={() => setHoveredLink(link.name)}
+                    onFocus={() => {
+                      if (!isMobileNav) setHoveredLink(link.name);
+                    }}
                     onBlur={() => setHoveredLink(null)}
                     aria-current={isActive ? "page" : undefined}
                     onClick={(event) => {
@@ -260,7 +300,7 @@ const Navbar = ({ immersive = false }: NavbarProps) => {
                     <span className="relative flex items-center">
                       <Icon className="h-[17px] w-[17px] shrink-0 stroke-[1.85] sm:h-[18px] sm:w-[18px]" />
                       <motion.span
-                        className="overflow-hidden whitespace-nowrap"
+                        className="hidden overflow-hidden whitespace-nowrap sm:inline-block"
                         initial={false}
                         animate={{
                           maxWidth: shouldRevealLabel ? 86 : 0,
@@ -301,7 +341,7 @@ const Navbar = ({ immersive = false }: NavbarProps) => {
               style={{
                 animationDelay: isNavVisible ? "260ms" : "0ms",
               }}
-              whileHover={{ y: -1, scale: 1.04 }}
+              whileHover={isMobileNav ? undefined : { y: -1, scale: 1.04 }}
               whileTap={{ scale: 0.94 }}
               transition={{ type: "spring", stiffness: 420, damping: 30, mass: 0.42 }}
               aria-label="Toggle dark mode"
